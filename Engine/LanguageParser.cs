@@ -28,7 +28,7 @@ namespace Engine
                 commandLines = rawInput.Replace("\r", "").Split('\n').ToList();
                 foreach (string line in commandLines)
                 {
-                    words.Add(line.Split(' ').ToList());
+                    if (line != "") words.Add(line.Split(' ').ToList());
                 }
                 error = "";
                 return true;

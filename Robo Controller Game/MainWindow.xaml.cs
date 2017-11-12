@@ -39,8 +39,14 @@ namespace Robo_Controller_Game
             if (Error != "") MessageBox.Show(Error);
         }
 
-        private void textBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+        }
+
+        private void ClearCode_Click(object sender, RoutedEventArgs e)
+        {
+            codeView.Text = "";
+            codeView.Focus();
         }
     }
 }
