@@ -5,8 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Robo_Controller_Game"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow" Height="377.568" Width="771.691">
+    <Canvas x:Name="GameBoard" HorizontalAlignment="Left" Height="313" Margin="417,0,0,0" VerticalAlignment="Top" Width="345" Initialized="GameBoard_Initialized">
+        <GroupBox x:Name="robotInfo" Header="Robot Info" Height="314" Canvas.Left="-415" Canvas.Top="2" Width="187">
+            <Button x:Name="button" Content="Run!" HorizontalAlignment="Left" Height="25" Margin="0,270,-2,-3" VerticalAlignment="Top" Width="177" Click="Button_Click" />
+        </GroupBox>
+        <TextBox x:Name="codeView" Height="303" Canvas.Left="-223" TextWrapping="Wrap" Canvas.Top="12" Width="217" RenderTransformOrigin="0.5,0.5" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="True" Background="#FF9C9C9C" TextChanged="textBox_TextChanged">
+            <TextBox.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform />
+                    <SkewTransform />
+                    <RotateTransform Angle="0.149" />
+                    <TranslateTransform />
+                </TransformGroup>
+            </TextBox.RenderTransform>
+        </TextBox>
+        <ProgressBar x:Name="CPUProgressBar" Height="18" Canvas.Left="1" Canvas.Top="322" Width="336" />
+    </Canvas>
 </Window>
