@@ -76,7 +76,7 @@ namespace Engine
 
     public class Robot : Entity
     {
-        public int speed = 1000; //Milliseconds per command
+        public int CPUSpeed = 1000; //Milliseconds per command
 
         public Robot(int id, Point start, GameWorld gameWorld) : base(id, Colors.Red, start)
         {

@@ -23,6 +23,10 @@ namespace Engine
         private int timeElapsed = 0;
         private ProgressBar CPUprogressBar;
 
+        private List<RobotEquipment> robotEquipment = new List<RobotEquipment>();
+        private List<RobotEquipment> initalEquipment;
+        public List<RobotEquipment> activeEquipment;
+
         public GameController(int width, int height, Canvas GameBoard, ProgressBar CPUProgressBar, Window window)
         {
             CPUprogressBar = CPUProgressBar;
@@ -40,12 +44,25 @@ namespace Engine
             EventHandler eventHandler = new EventHandler(HandleCommandTime);
             commandTimer.Tick += eventHandler;
             commandTimer.Start();
+            InitialRobotInfo();
+        }
+
+        private void InitialRobotInfo()
+        {
+            //Setup game state
+            {
+                int EquipmentIDCounter = 0;
+                robotEquipment.Add(new BasicCPU("ep" + EquipmentIDCounter++.ToString(), robot));
+                robotEquipment.Add(new BasicCasing("ep" + EquipmentIDCounter++.ToString(), robot));
+                initalEquipment = new List<RobotEquipment>(robotEquipment);
+                activeEquipment = new List<RobotEquipment>(initalEquipment);
+            }
             SettupRobotInfo();
         }
 
         private void SettupRobotInfo()
         {
-            CPUprogressBar.Maximum = robot.speed;
+            CPUprogressBar.Maximum = robot.CPUSpeed;
             return;
         }
 
@@ -54,7 +71,7 @@ namespace Engine
             if (languageParser.words.Count + languageParser.actions.Count == 0) return;
             timeElapsed += 10;
             string error = "";
-            if (timeElapsed >= robot.speed)
+            if (timeElapsed >= robot.CPUSpeed)
             {
                 timeElapsed = 0;
                 if (languageParser.actions.Count != 0)
@@ -75,7 +92,7 @@ namespace Engine
             {
                 CPUprogressBar.Value = timeElapsed;
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
             return;

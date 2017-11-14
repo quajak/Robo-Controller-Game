@@ -1,4 +1,5 @@
 ﻿using Engine;
+using Robo_Controller_Game.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,24 @@ namespace Robo_Controller_Game
         public MainWindow()
         {
             InitializeComponent();
+
             gameController = new GameController((int)GameBoard.Width / 10, (int)GameBoard.Height / 10, GameBoard, CPUProgressBar, this);
+            int c = 0;
+            foreach (RobotEquipment part in gameController.activeEquipment)
+            {
+                RowDefinition row = new RowDefinition
+                {
+                    Height = new GridLength(140)
+                };
+                robotPartGrid.RowDefinitions.Add(row);
+                RobotPart robotPart = new RobotPart(part.name, part.Description, part.image)
+                {
+                    Name = part.id
+                };
+                Grid.SetColumn(robotPart, 0);
+                Grid.SetRow(robotPart, c++);
+                robotPartGrid.Children.Add(robotPart);
+            }
         }
 
         private void GameBoard_Initialized(object sender, EventArgs e)
