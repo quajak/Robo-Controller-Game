@@ -6,15 +6,17 @@
         xmlns:local="clr-namespace:Robo_Controller_Game"
         mc:Ignorable="d"
         Title="MainWindow" Height="573.095" Width="1160.549">
-    <Canvas x:Name="GameBoard" HorizontalAlignment="Left" Height="313" Margin="788,0,0,0" VerticalAlignment="Top" Width="345" Initialized="GameBoard_Initialized">
-        <Button x:Name="button" Content="Run!" HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="217" Click="Button_Click" Canvas.Left="-405" Canvas.Top="335" />
+    <Canvas>
+        <Button x:Name="button" Content="Run!" HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="217" Click="Button_Click" Canvas.Left="571" Canvas.Top="326" />
 
-        <TextBox x:Name="codeView" Height="269" Canvas.Left="-405" TextWrapping="Wrap" Canvas.Top="13" Width="217" RenderTransformOrigin="0.5,0.5" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="True" Background="#FF9C9C9C" TextChanged="TextBox_TextChanged">
+        <TextBox x:Name="codeView" Height="269" Canvas.Left="571" TextWrapping="Wrap" Canvas.Top="10" Width="217" RenderTransformOrigin="0.5,0.5" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="True" Background="#FF9C9C9C" TextChanged="TextBox_TextChanged">
         </TextBox>
-        <ProgressBar x:Name="CPUProgressBar" Height="18" Canvas.Left="1" Canvas.Top="322" Width="336" />
-        <Button x:Name="clearCode" Content="Clear" Canvas.Left="-263" Canvas.Top="289" Width="75" Height="26" Click="ClearCode_Click" />
-        <Label x:Name="robotInfoTitle" Content="Robot Info Title" Canvas.Left="-772" Canvas.Top="13" Width="177" FontWeight="Bold" />
-        <Grid x:Name="robotPartGrid" Height="460" Canvas.Left="-772" Canvas.Top="39" Width="331" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <ProgressBar x:Name="CPUProgressBar" Height="18" Canvas.Left="797" Canvas.Top="318" Width="336" />
+        <Button x:Name="clearCode" Content="Clear" Canvas.Left="571" Canvas.Top="295" Width="75" Height="26" Click="ClearCode_Click" />
+        <Label x:Name="robotInfoTitle" Content="Robot Info Title" Canvas.Left="38" Canvas.Top="10" Width="177" FontWeight="Bold" />
+        <Grid x:Name="robotPartGrid" Height="460" Canvas.Left="38" Canvas.Top="41" Width="331" HorizontalAlignment="Left" VerticalAlignment="Top">
         </Grid>
+        <Canvas x:Name="GameBoard" HorizontalAlignment="Left" Height="313" Margin="788,0,0,0" VerticalAlignment="Top" Width="345" Initialized="GameBoard_Initialized" MaxWidth="345" MaxHeight="313" ClipToBounds="True">
+        </Canvas>
     </Canvas>
 </Window>

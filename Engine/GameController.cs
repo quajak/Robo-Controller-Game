@@ -33,9 +33,7 @@ namespace Engine
             Point start = new Point(0, 0);
             languageParser = new LanguageExecuter(this);
             gameWorld = new GameWorld(width, height, start);
-            robot = new Robot(entityCounter++, start, gameWorld);
             renderer = new Renderer(GameBoard, gameWorld.map.Cast<GameObject>().ToList());
-            renderer.AddEntity(robot);
 
             commandTimer = new DispatcherTimer
             {
@@ -45,6 +43,10 @@ namespace Engine
             commandTimer.Tick += eventHandler;
             commandTimer.Start();
             InitialRobotInfo();
+
+            robot = new Robot(entityCounter++, start, gameWorld, activeEquipment);
+            renderer.AddEntity(robot, isImage: true);
+            SettupRobotInfo();
         }
 
         private void InitialRobotInfo()
@@ -57,7 +59,6 @@ namespace Engine
                 initalEquipment = new List<RobotEquipment>(robotEquipment);
                 activeEquipment = new List<RobotEquipment>(initalEquipment);
             }
-            SettupRobotInfo();
         }
 
         private void SettupRobotInfo()

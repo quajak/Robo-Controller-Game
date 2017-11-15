@@ -74,12 +74,55 @@ namespace Engine
         }
     }
 
-    public class Robot : Entity
+    public abstract class ImageEntity : Entity
+    {
+        public ImageEntity(int ID, Color Color, Point Position) : base(ID, Color, Position)
+        {
+        }
+
+        public abstract System.Drawing.Image CurrentImage();
+    }
+
+    public class Robot : ImageEntity
     {
         public int CPUSpeed = 1000; //Milliseconds per command
+        public List<RobotEquipment> equipment;
 
-        public Robot(int id, Point start, GameWorld gameWorld) : base(id, Colors.Red, start)
+        public override System.Drawing.Image CurrentImage()
         {
+            //Sort the equipment
+            equipment = equipment.Where(e => e.drawingLevel != -1).ToList();
+            equipment.Sort((a, b) => a.drawingLevel - b.drawingLevel);
+
+            System.Drawing.Image image = new System.Drawing.Bitmap(64, 64);
+
+            using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(image))
+            {
+                g.DrawRectangle(System.Drawing.Pens.Transparent, 0, 0, 64, 64);
+                foreach (RobotEquipment part in equipment)
+                {
+                    g.DrawImage(ImageWpfToGdi2(part.image), 0, 0);
+                }
+            }
+
+            return image;
+        }
+
+        public System.Drawing.Image ImageWpfToGdi2(ImageSource image)
+        {
+            var ms = new System.IO.MemoryStream();
+            var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder();
+            encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(
+                    (System.Windo‌​ws.Media.Imaging.Bit‌​mapSource)image));
+            encoder.Save(ms);
+            ms.Flush();
+            var btm = (System.Drawing.Bitmap)System.Drawing.Image.FromStream(ms);
+            return btm;
+        }
+
+        public Robot(int id, Point start, GameWorld gameWorld, List<RobotEquipment> parts) : base(id, Colors.Red, start)
+        {
+            equipment = parts;
             EnterField = e =>
             {
                 GameObject field;

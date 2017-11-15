@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Controls;
 using System.Windows.Shapes;
+using System.Windows.Media.Imaging;
 
 namespace Engine
 {
@@ -16,7 +17,8 @@ namespace Engine
         private Canvas canvas;
 
         private List<GameObject> gameObjects = new List<GameObject>();
-        private List<Rectangle> shapes = new List<Rectangle>();
+        private List<Shape> shapes = new List<Shape>();
+        private List<Image> images = new List<Image>();
 
         public Renderer(Canvas Canvas, List<GameObject> GameObjects)
         {
@@ -25,8 +27,8 @@ namespace Engine
                 new Rectangle()
                 {
                     Name = "f" + g.id.ToString(),
-                    Width = 10,
-                    Height = 10,
+                    Width = GameWorld.fieldSize,
+                    Height = GameWorld.fieldSize,
                     Fill = new SolidColorBrush(g.color),
                     Stroke = new SolidColorBrush(g.color)
                 }));
@@ -40,26 +42,46 @@ namespace Engine
             });
         }
 
+        protected static ImageSource BitmapToImageSource(System.Drawing.Bitmap image)
+        {
+            return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(image.GetHbitmap(),
+                IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        }
+
         public void Update()
         {
             gameObjects.ForEach(g =>
            {
                if (g.updated)
                {
-                   SetPosition(g, shapes.First(s => s.Name == "e" + g.id.ToString()));
+                   SetPosition(g.id, g.position);
                    g.updated = false;
                }
            });
         }
 
-        public void AddEntity(GameObject g)
+        public void AddEntity(GameObject g, bool isImage = false)
         {
             gameObjects.Add(g);
+            if (isImage)
+            {
+                Image img = new Image
+                {
+                    Name = "e" + g.id.ToString(),
+                    Width = GameWorld.fieldSize,
+                    Height = GameWorld.fieldSize,
+                    Source = BitmapToImageSource(new System.Drawing.Bitmap(((ImageEntity)g).CurrentImage()))
+                };
+                canvas.Children.Add(img);
+                SetPosition(g.id);
+                images.Add(img);
+                return;
+            }
             Rectangle s = new Rectangle()
             {
                 Name = "e" + g.id.ToString(),
-                Width = 10,
-                Height = 10,
+                Width = GameWorld.fieldSize,
+                Height = GameWorld.fieldSize,
                 Fill = new SolidColorBrush(g.color),
                 Stroke = new SolidColorBrush(g.color)
             };
@@ -75,8 +97,14 @@ namespace Engine
 
         private void SetPosition(GameObject g, Shape s)
         {
-            Canvas.SetTop(s, g.position.Y * 10);
-            Canvas.SetLeft(s, g.position.X * 10);
+            Canvas.SetTop(s, g.position.Y * GameWorld.fieldSize);
+            Canvas.SetLeft(s, g.position.X * GameWorld.fieldSize);
+        }
+
+        private void SetPosition(GameObject g, Image s)
+        {
+            Canvas.SetTop(s, g.position.Y * GameWorld.fieldSize);
+            Canvas.SetLeft(s, g.position.X * GameWorld.fieldSize);
         }
 
         private void SetPosition(int Id, Point offset)
@@ -95,6 +123,13 @@ namespace Engine
                             Canvas.SetLeft(r, g.position.X);
                         }
                     });
+                    images.ForEach(i =>
+                   {
+                       if (i.Name == "e" + g.id.ToString())
+                       {
+                           SetPosition(g, i);
+                       }
+                   });
                 }
             });
         }

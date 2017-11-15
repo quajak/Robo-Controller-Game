@@ -17,6 +17,7 @@ namespace Engine
         protected Robot robot;
         protected string description;
         public ImageSource image;
+        public readonly int drawingLevel;
 
         public string Description
         {
@@ -27,12 +28,13 @@ namespace Engine
             }
         }
 
-        public RobotEquipment(string ID, string Name, Robot Robot, ImageSource imageSource)
+        public RobotEquipment(string ID, string Name, Robot Robot, ImageSource imageSource, int DrawingLevel)
         {
             image = imageSource;
             id = ID;
             name = Name;
             robot = Robot;
+            drawingLevel = DrawingLevel;
         }
 
         protected abstract void UpdateDescription();
@@ -49,7 +51,7 @@ namespace Engine
     internal class BasicCPU : RobotEquipment
     {
         public BasicCPU(string ID, Robot robot) : base(ID, "CPU MK 1", robot,
-            BitmapToImageSource(Resources.CPUBasic))
+            BitmapToImageSource(Resources.CPUBasic), -1)
         {
         }
 
@@ -68,7 +70,7 @@ namespace Engine
     internal class BasicCasing : RobotEquipment
     {
         public BasicCasing(string ID, Robot robot) : base(ID, "Casing MK 1", robot,
-            BitmapToImageSource(Resources.BasicCasing))
+            BitmapToImageSource(Resources.BasicCasing), 0)
         {
         }
 

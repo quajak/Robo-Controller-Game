@@ -16,7 +16,7 @@ namespace Engine
 
         private readonly int width;
         private readonly int height;
-        private readonly int fieldSize = 10;
+        public const int fieldSize = 20;
 
         private readonly Random rng;
 

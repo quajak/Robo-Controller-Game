@@ -71,5 +71,11 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BasicCasingRobot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BasicCasingRobotT.tif" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
