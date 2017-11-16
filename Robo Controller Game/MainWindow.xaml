@@ -23,5 +23,8 @@
         </Grid>
         <Canvas x:Name="GameBoard" HorizontalAlignment="Left" Height="313" VerticalAlignment="Top" Width="345" Initialized="GameBoard_Initialized" MaxWidth="345" MaxHeight="313" ClipToBounds="True" Canvas.Left="1007" />
         <Grid x:Name="robotPartGridSecond" Height="400" Canvas.Left="374" Canvas.Top="41" Width="331" HorizontalAlignment="Left" VerticalAlignment="Top" />
+        <Border BorderBrush="Black" BorderThickness="1" Height="91" Canvas.Left="38" Canvas.Top="441" Width="326">
+            <Label x:Name="MoneyCounter" Content="Money:" />
+        </Border>
     </Canvas>
 </Window>

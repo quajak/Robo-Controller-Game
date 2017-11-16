@@ -23,19 +23,40 @@ namespace Robo_Controller_Game
     /// </summary>
     public partial class RobotPart : UserControl
     {
-        public RobotPart(string Name, string Descriptor, string Picture)
+        private string BaseText;
+        private bool beingSold = false;
+        private int cost;
+
+        public bool BeingSold
+        {
+            get { return beingSold; }
+            set
+            {
+                beingSold = value;
+                if (beingSold)
+                    SetDescriptor = BaseText + $"The price is {cost}.";
+                else SetDescriptor = BaseText;
+            }
+        }
+
+        public RobotPart(string Name, string Descriptor, int Cost, string Picture)
         {
             InitializeComponent();
 
+            cost = Cost;
             SetName = Name;
+            BaseText = Descriptor;
             SetDescriptor = Descriptor;
             SetPicturePath = Picture;
         }
 
-        public RobotPart(string Name, string Descriptor, ImageSource Picture)
+        public RobotPart(string Name, string Descriptor, int Cost, ImageSource Picture)
         {
             InitializeComponent();
+
+            cost = Cost;
             SetName = Name;
+            BaseText = Descriptor;
             SetDescriptor = Descriptor;
             SetPicture = Picture;
         }

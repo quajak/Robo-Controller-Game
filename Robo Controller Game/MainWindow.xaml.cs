@@ -30,6 +30,7 @@ namespace Robo_Controller_Game
 
             gameController = new GameController((int)GameBoard.Width / 10, (int)GameBoard.Height / 10, GameBoard, CPUProgressBar, this);
             ShowRobotEquipment();
+            UpdatePlayerUI();
         }
 
         private void ShowRobotEquipment()
@@ -47,7 +48,7 @@ namespace Robo_Controller_Game
                     Height = new GridLength(140)
                 };
                 robotPartGrid.RowDefinitions.Add(row);
-                RobotPart robotPart = new RobotPart(part.name, part.Description, part.image)
+                RobotPart robotPart = new RobotPart(part.name, part.Description, part.price, part.image)
                 {
                     Name = part.id
                 };
@@ -95,7 +96,10 @@ namespace Robo_Controller_Game
             gameController.toBuy.ForEach(i =>
             {
                 robotPartGridSecond.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(140) });
-                RobotPart robotPart = new RobotPart(i.name, i.Description, i.image);
+                RobotPart robotPart = new RobotPart(i.name, i.Description, i.price, i.image)
+                {
+                    BeingSold = true
+                };
                 Grid.SetColumn(robotPart, 0);
                 Grid.SetRow(robotPart, c++);
                 robotPart.Click += ShopClick;
@@ -109,9 +113,18 @@ namespace Robo_Controller_Game
             string id = ((Control)sender).Name;
             RobotEquipment bought = gameController.toBuy.Find(t => t.id == id);
             //TODO: Handle money
-            gameController.toBuy.Remove(bought);
-            gameController.activeEquipment.Add(bought);
+            if (bought.price <= gameController.player.money)
+            {
+                gameController.player.money -= bought.price;
+                gameController.toBuy.Remove(bought);
+                gameController.activeEquipment.Add(bought);
+            }
+            else
+
+                MessageBox.Show($"You do not have enough money! This costs{bought.price}");
+
             //Refresh
+            UpdatePlayerUI();
             OpenShop(sender, e);
             ShowRobotEquipment();
         }
@@ -134,6 +147,11 @@ namespace Robo_Controller_Game
         {
             codeView.Text = "";
             codeView.Focus();
+        }
+
+        private void UpdatePlayerUI()
+        {
+            MoneyCounter.Content = "Money: " + gameController.player.money.ToString();
         }
     }
 }

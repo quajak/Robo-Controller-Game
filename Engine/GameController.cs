@@ -28,8 +28,13 @@ namespace Engine
         public List<RobotEquipment> activeEquipment;
         public List<RobotEquipment> toBuy;
 
+        public Player player;
+
         public GameController(int width, int height, Canvas GameBoard, ProgressBar CPUProgressBar, Window window)
         {
+            //setup player
+            player = new Player();
+
             CPUprogressBar = CPUProgressBar;
             Point start = new Point(0, 0);
             languageParser = new LanguageExecuter(this);
