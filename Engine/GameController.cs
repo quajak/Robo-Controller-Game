@@ -23,9 +23,10 @@ namespace Engine
         private int timeElapsed = 0;
         private ProgressBar CPUprogressBar;
 
-        private List<RobotEquipment> robotEquipment = new List<RobotEquipment>();
+        public List<RobotEquipment> robotEquipment = new List<RobotEquipment>();
         private List<RobotEquipment> initalEquipment;
         public List<RobotEquipment> activeEquipment;
+        public List<RobotEquipment> toBuy;
 
         public GameController(int width, int height, Canvas GameBoard, ProgressBar CPUProgressBar, Window window)
         {
@@ -58,6 +59,8 @@ namespace Engine
                 robotEquipment.Add(new BasicCasing("ep" + EquipmentIDCounter++.ToString(), robot));
                 initalEquipment = new List<RobotEquipment>(robotEquipment);
                 activeEquipment = new List<RobotEquipment>(initalEquipment);
+                robotEquipment.Add(new BasicDrill(robot));
+                toBuy = new List<RobotEquipment>(robotEquipment.Where(e => activeEquipment.FindIndex(a => a.id == e.id) == -1));
             }
         }
 

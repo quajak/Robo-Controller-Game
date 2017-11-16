@@ -77,5 +77,8 @@
   <ItemGroup>
     <None Include="Resources\BasicCasingRobotT.tif" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\DrillBasic.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -71,5 +71,13 @@ namespace Robo_Controller_Game
                 image.Source = new BitmapImage(new Uri(value));
             }
         }
+
+        public event EventHandler Click;
+
+        private void Clicked(object sender, MouseButtonEventArgs e)
+        {
+            if (Click != null)
+                this.Click(this, e);
+        }
     }
 }
