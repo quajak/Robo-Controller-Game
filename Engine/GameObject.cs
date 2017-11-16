@@ -18,7 +18,6 @@ namespace Engine
 
         public bool blocking;
         public List<Entity> entities;
-        public bool destroyable;
         public int health;
 
         public int Angle
@@ -43,23 +42,33 @@ namespace Engine
         }
     }
 
-    public class Space : GameObject
+    public class MapObject : GameObject
+    {
+        public bool mineable;
+
+        public MapObject(int ID, Color Color, Point Position, bool blocking = false, bool Mineable = false) : base(ID, Color, Position, blocking)
+        {
+            mineable = Mineable;
+        }
+    }
+
+    public class Space : MapObject
     {
         public Space(int ID, Point Position) : base(ID, Colors.Transparent, Position)
         {
         }
     }
 
-    public class Wall : GameObject
+    public class Wall : MapObject
     {
-        public Wall(int ID, Point Position) : base(ID, Colors.Black, Position, true)
+        public Wall(int ID, Point Position) : base(ID, Colors.Black, Position, true, false)
         {
         }
     }
 
-    public class Boulder : GameObject
+    public class Boulder : MapObject
     {
-        public Boulder(int ID, Point Position) : base(ID, Colors.DarkGray, Position, true)
+        public Boulder(int ID, Point Position) : base(ID, Colors.DarkGray, Position, true, true)
         {
         }
     }
@@ -120,41 +129,12 @@ namespace Engine
             return btm;
         }
 
-        public Robot(int id, Point start, GameWorld gameWorld, List<RobotEquipment> parts) : base(id, Colors.Red, start)
+        public Robot(int id, Point start, GameController gameController, List<RobotEquipment> parts) : base(id, Colors.Red, start)
         {
             equipment = parts;
             EnterField = e =>
             {
-                GameObject field;
-                Vector movement;
-                switch (e.Angle)
-                {
-                    case (0) when (e.position.X != gameWorld.map.GetUpperBound(0)):
-                        field = gameWorld.map[(int)e.position.X + 1, (int)e.position.Y];
-                        movement = new Vector(1, 0);
-                        break;
-
-                    case (90) when (e.position.Y != 0):
-                        field = gameWorld.map[(int)e.position.X, (int)e.position.Y - 1];
-                        movement = new Vector(0, -1);
-                        break;
-
-                    case (180) when (e.position.X != 0):
-                        field = gameWorld.map[(int)e.position.X - 1, (int)e.position.Y];
-                        movement = new Vector(-1, 0);
-                        break;
-
-                    case (270) when (e.position.Y != gameWorld.map.GetUpperBound(1)):
-                        field = gameWorld.map[(int)e.position.X, (int)e.position.Y + 1];
-                        movement = new Vector(0, 1);
-                        break;
-
-                    case int value:
-                        return false;
-
-                    default:
-                        throw new Exception("The angle has a wrong value!");
-                }
+                Vector movement = LanguageExecuter.GetOffset(e.Angle, e.position, gameController.gameWorld, out MapObject field);
                 if (!field.blocking && field.entities.TrueForAll(E => !E.blocking))
                 {
                     //Change map tile owner
@@ -174,7 +154,7 @@ namespace Engine
                     return false;
                 }
             };
-            link = gameWorld.map[0, 0];
+            link = gameController.gameWorld.map[0, 0];
         }
     }
 }

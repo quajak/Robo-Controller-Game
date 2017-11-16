@@ -50,7 +50,7 @@ namespace Engine
             commandTimer.Start();
             InitialRobotInfo();
 
-            robot = new Robot(entityCounter++, start, gameWorld, activeEquipment);
+            robot = new Robot(entityCounter++, start, this, activeEquipment);
             renderer.AddEntity(robot, isImage: true);
             SettupRobotInfo();
         }
@@ -77,7 +77,7 @@ namespace Engine
 
         private void HandleCommandTime(object obj, EventArgs args)
         {
-            if (languageParser.words.Count + languageParser.actions.Count == 0) return;
+            if (languageParser.commands.Count + languageParser.actions.Count == 0) return;
             timeElapsed += 10;
             string error = "";
             if (timeElapsed >= robot.CPUSpeed)
@@ -96,6 +96,9 @@ namespace Engine
             if (error != "")
             {
                 MessageBox.Show(error);
+                //Clear languageParser
+                languageParser.actions.Clear();
+                languageParser.commands.Clear();
             }
             try
             {

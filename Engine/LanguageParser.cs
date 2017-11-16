@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Engine
 {
@@ -10,7 +11,7 @@ namespace Engine
     {
         private string rawInput = "";
         private List<string> commandLines = new List<string>();
-        public List<List<string>> words = new List<List<string>>();
+        public List<List<string>> commands = new List<List<string>>();
         private GameController gameController;
         public List<string> actions = new List<string>();
 
@@ -21,14 +22,14 @@ namespace Engine
 
         public bool ParseText(string text, out string error)
         {
-            words = new List<List<string>>();
+            commands = new List<List<string>>();
             try
             {
                 rawInput = text;
                 commandLines = rawInput.Replace("\r", "").Split('\n').ToList();
                 foreach (string line in commandLines)
                 {
-                    if (line != "") words.Add(line.Split(' ').ToList());
+                    if (line != "") commands.Add(line.Split(' ').ToList());
                 }
                 error = "";
                 return true;
@@ -42,7 +43,7 @@ namespace Engine
 
         public bool ExecuteFile(out string error)
         {
-            if (!ExectuteLine(words[0], out error))
+            if (!ExectuteLine(commands[0], out error))
             {
                 return false;
             };
@@ -53,7 +54,7 @@ namespace Engine
         {
             if (!wholeFile) return ExecuteFile(out Error);
             int counter = 0;
-            foreach (List<string> line in words)
+            foreach (List<string> line in commands)
             {
                 counter++;
                 if (!ExectuteLine(line, out string error))
@@ -115,12 +116,65 @@ namespace Engine
                     }
                     break;
 
+                case "mine" when parameters.Length == 0:
+                    //Check if player is able to mine
+                    if (gameController.activeEquipment.Find(e => e.type == EquipmentType.mining) != null)
+                    {
+                        Vector direction = GetOffset(gameController.robot.Angle, gameController.robot.position, gameController.gameWorld, out MapObject field);
+                        if (field == null) throw new Exception("Something went wrong!");
+                        if (!field.mineable) break;
+                        int x = (int)(field.position.X / GameWorld.fieldSize);
+                        int y = (int)(field.position.Y / GameWorld.fieldSize);
+                        //mine field
+                        gameController.renderer.RemoveEntity(gameController.gameWorld.map[x, y]);
+                        gameController.gameWorld.map[x, y] = new Space(field.id, field.position) { updated = true };
+                        gameController.renderer.AddEntity(gameController.gameWorld.map[x, y]);
+                    }
+                    else
+                    {
+                        error = "You do not have any equpiment that can mine!";
+                        return false;
+                    }
+
+                    break;
+
                 default:
                     break;
             }
-            words.RemoveAt(0);
+            commands.RemoveAt(0);
             error = "";
             return true;
+        }
+
+        public static Vector GetOffset(int Angle, Point position, GameWorld gameWorld, out MapObject field)
+        {
+            Vector movement;
+            switch (Angle)
+            {
+                case (0) when (position.X != gameWorld.map.GetUpperBound(0)):
+                    field = gameWorld.map[(int)position.X + 1, (int)position.Y];
+                    movement = new Vector(1, 0);
+                    break;
+
+                case (90) when (position.Y != 0):
+                    field = gameWorld.map[(int)position.X, (int)position.Y - 1];
+                    movement = new Vector(0, -1);
+                    break;
+
+                case (180) when (position.X != 0):
+                    field = gameWorld.map[(int)position.X - 1, (int)position.Y];
+                    movement = new Vector(-1, 0);
+                    break;
+
+                case (270) when (position.Y != gameWorld.map.GetUpperBound(1)):
+                    field = gameWorld.map[(int)position.X, (int)position.Y + 1];
+                    movement = new Vector(0, 1);
+                    break;
+
+                default:
+                    throw new Exception("The angle has a wrong value!");
+            }
+            return movement;
         }
 
         public bool ExecuteAction(out string error)
@@ -137,7 +191,7 @@ namespace Engine
                     break;
 
                 default:
-                    break;
+                    throw new Exception("This action is not defined!" + actions[0]);
             }
             error = "";
             return true;

@@ -10,7 +10,7 @@ namespace Engine
 {
     public class GameWorld
     {
-        public GameObject[,] map;
+        public MapObject[,] map;
 
         public List<Entity> Entities { get; private set; }
 
@@ -27,14 +27,14 @@ namespace Engine
             width = Width;
             height = Height;
 
-            map = new GameObject[width, height];
+            map = new MapObject[width, height];
 
             int ID = 0;
             for (int x = 0; x <= map.GetUpperBound(0); x++)
             {
                 for (int y = 0; y <= map.GetUpperBound(1); y++)
                 {
-                    GameObject tile;
+                    MapObject tile;
                     switch (rng.Next(10))
                     {
                         case int val when (val < 3):
@@ -52,7 +52,7 @@ namespace Engine
                     map[x, y] = tile;
                 }
 
-                map[(int)start.X, (int)start.Y] = new GameObject(ID++, Colors.Transparent, new Point(start.X * fieldSize, start.Y * fieldSize));
+                map[(int)start.X, (int)start.Y] = new MapObject(ID++, Colors.Transparent, new Point(start.X * fieldSize, start.Y * fieldSize));
             }
         }
 

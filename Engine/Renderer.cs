@@ -54,7 +54,7 @@ namespace Engine
            {
                if (g.updated)
                {
-                   SetPosition(g.id, g.position);
+                   SetAbsolutePosition(g.id, g.position);
                    g.updated = false;
                }
            });
@@ -67,7 +67,7 @@ namespace Engine
             {
                 Image img = new Image
                 {
-                    Name = "e" + g.id.ToString(),
+                    Name = "f" + g.id.ToString(),
                     Width = GameWorld.fieldSize,
                     Height = GameWorld.fieldSize,
                     Source = BitmapToImageSource(new System.Drawing.Bitmap(((ImageEntity)g).CurrentImage()))
@@ -79,7 +79,7 @@ namespace Engine
             }
             Rectangle s = new Rectangle()
             {
-                Name = "e" + g.id.ToString(),
+                Name = "f" + g.id.ToString(),
                 Width = GameWorld.fieldSize,
                 Height = GameWorld.fieldSize,
                 Fill = new SolidColorBrush(g.color),
@@ -88,6 +88,30 @@ namespace Engine
             canvas.Children.Add(s);
             SetPosition(int.Parse(s.Name.Remove(0, 1)));
             shapes.Add(s);
+        }
+
+        public void RemoveEntity(GameObject g)
+        {
+            List<Shape> _Shape = new List<Shape>(shapes);
+            foreach (Shape s in shapes)
+            {
+                if (s.Name == "f" + g.id.ToString())
+                {
+                    _Shape.Remove(s);
+                    canvas.Children.Remove(s);
+                }
+            };
+            shapes = _Shape;
+            images.ForEach(i =>
+            {
+                if (i.Name == "f" + g.id.ToString())
+                {
+                    images.Remove(i);
+                    canvas.Children.Remove(i);
+                }
+            });
+
+            gameObjects.Remove(g);
         }
 
         public bool LoadScene()
@@ -121,15 +145,47 @@ namespace Engine
                         {
                             Canvas.SetTop(r, g.position.Y);
                             Canvas.SetLeft(r, g.position.X);
+                            return;
                         }
                     });
                     images.ForEach(i =>
                    {
-                       if (i.Name == "e" + g.id.ToString())
+                       if (i.Name == "f" + g.id.ToString())
                        {
                            SetPosition(g, i);
+                           return;
                        }
                    });
+                    return;
+                }
+            });
+        }
+
+        private void SetAbsolutePosition(int Id, Point position)
+        {
+            gameObjects.ForEach(g =>
+            {
+                if (Id == g.id)
+                {
+                    g.position = position;
+                    shapes.ForEach(r =>
+                    {
+                        if (r.Name == "f" + g.id.ToString())
+                        {
+                            Canvas.SetTop(r, g.position.Y);
+                            Canvas.SetLeft(r, g.position.X);
+                            return;
+                        }
+                    });
+                    images.ForEach(i =>
+                   {
+                       if (i.Name == "f" + g.id.ToString())
+                       {
+                           SetPosition(g, i);
+                           return;
+                       }
+                   });
+                    return;
                 }
             });
         }
