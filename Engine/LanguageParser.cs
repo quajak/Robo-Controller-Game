@@ -104,10 +104,13 @@ namespace Engine
                 case "rot" when parameters.Length == 1:
                     int angle = 0;
                     if (parameters[0].ToLower() == "left") angle = 90;
-                    else if (parameters[0].ToLower() == "right") angle = 270;
+                    else if (parameters[0].ToLower() == "right") angle = -90;
                     if (angle != 0 || Int32.TryParse(parameters[0], out angle))
                     {
                         gameController.robot.Angle += angle;
+                        gameController.robot.updated = true;
+                        gameController.robot.animate = true;
+                        gameController.robot.animationType = AnimationType.rotation;
                     }
                     else
                     {
@@ -122,7 +125,7 @@ namespace Engine
                     {
                         Vector direction = GetOffset(gameController.robot.Angle, gameController.robot.position, gameController.gameWorld, out MapObject field);
                         if (field == null) throw new Exception("Something went wrong!");
-                        if (!field.mineable) break;
+                        if (direction == new Vector(0, 0) || !field.mineable) break;
                         int x = (int)(field.position.X / GameWorld.fieldSize);
                         int y = (int)(field.position.Y / GameWorld.fieldSize);
                         //mine field
@@ -169,6 +172,11 @@ namespace Engine
                 case (270) when (position.Y != gameWorld.map.GetUpperBound(1)):
                     field = gameWorld.map[(int)position.X, (int)position.Y + 1];
                     movement = new Vector(0, 1);
+                    break;
+
+                case int value:
+                    field = gameWorld.map[(int)position.X, (int)position.Y];
+                    movement = new Vector(0, 0);
                     break;
 
                 default:

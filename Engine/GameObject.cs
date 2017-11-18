@@ -8,16 +8,23 @@ using System.Windows.Media;
 
 namespace Engine
 {
+    public enum AnimationType { movement, rotation };
+
     public class GameObject
     {
         public Point position;
         public Color color;
         public readonly int id;
         private int angle;
+        private int oldAngle;
+
         public bool updated = false;
+        public AnimationType animationType;
+        public bool animate = false;
 
         public bool blocking;
         public List<Entity> entities;
+
         public int health;
 
         public int Angle
@@ -25,10 +32,16 @@ namespace Engine
             get { return angle; }
             set
             {
+                oldAngle = angle;
                 angle = value;
                 if (angle < 0) angle += 360;
                 if (angle >= 360) angle -= 360;
             }
+        }
+
+        public int OldAngle
+        {
+            get { return oldAngle; }
         }
 
         public GameObject(int Id, Color Color, Point Position, bool Blocking = false)
@@ -135,6 +148,7 @@ namespace Engine
             EnterField = e =>
             {
                 Vector movement = LanguageExecuter.GetOffset(e.Angle, e.position, gameController.gameWorld, out MapObject field);
+                if (movement == new Vector(0, 0)) return true;
                 if (!field.blocking && field.entities.TrueForAll(E => !E.blocking))
                 {
                     //Change map tile owner
@@ -146,6 +160,8 @@ namespace Engine
                     e.position += movement;
 
                     e.updated = true;
+                    e.animationType = AnimationType.movement;
+                    e.animate = true;
                     return true;
                 }
                 else

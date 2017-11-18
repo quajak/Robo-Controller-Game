@@ -28,6 +28,8 @@ namespace Engine
         public List<RobotEquipment> activeEquipment;
         public List<RobotEquipment> toBuy;
 
+        public bool inAnimation = false;
+
         public Player player;
 
         public GameController(int width, int height, Canvas GameBoard, ProgressBar CPUProgressBar, Window window)
@@ -39,7 +41,7 @@ namespace Engine
             Point start = new Point(0, 0);
             languageParser = new LanguageExecuter(this);
             gameWorld = new GameWorld(width, height, start);
-            renderer = new Renderer(GameBoard, gameWorld.map.Cast<GameObject>().ToList());
+            renderer = new Renderer(this, GameBoard, gameWorld.map.Cast<GameObject>().ToList());
 
             commandTimer = new DispatcherTimer
             {
@@ -77,7 +79,7 @@ namespace Engine
 
         private void HandleCommandTime(object obj, EventArgs args)
         {
-            if (languageParser.commands.Count + languageParser.actions.Count == 0) return;
+            if (languageParser.commands.Count + languageParser.actions.Count == 0 || inAnimation) return;
             timeElapsed += 10;
             string error = "";
             if (timeElapsed >= robot.CPUSpeed)
@@ -112,12 +114,13 @@ namespace Engine
 
         public bool RunCode(string code, out string Error)
         {
+            Error = "";
+            if (languageParser.commands.Count + languageParser.actions.Count != 0 || inAnimation) return true;
             if (!languageParser.ParseText(code, out string error))
             {
                 Error = "Input is incorrect: " + error;
                 return false;
             }
-            Error = "";
             return true;
         }
     }
