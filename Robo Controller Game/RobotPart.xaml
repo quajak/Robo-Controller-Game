@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:Robo_Controller_Game"
-             mc:Ignorable="d" d:DesignWidth="300" Width="300" Height="136.986">
-    <Grid>
+             mc:Ignorable="d" d:DesignWidth="300" Width="300" Height="136.986" MouseEnter="Grid_MouseEnter" MouseLeave="UserControl_MouseLeave">
+    <Grid MouseEnter="Grid_MouseEnter">
         <Rectangle x:Name="background" Fill="#FF575757" HorizontalAlignment="Left" Stroke="Black" Width="300" RenderTransformOrigin="0.5,0.5" MouseDown="Clicked">
             <Rectangle.RenderTransform>
                 <TransformGroup>
@@ -21,5 +21,8 @@
         <Border BorderThickness="2px" BorderBrush="Green" Margin="85,41,10,10">
             <TextBlock x:Name="mainText" HorizontalAlignment="Left" Margin="0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Height="86" Width="200" Background="#FFB0B0B0" FontFamily="Ti73pc" FontStretch="Condensed" Padding="3,1,0,3" MouseLeftButtonDown="Clicked" />
         </Border>
+        <Grid x:Name="overlay" HorizontalAlignment="Left" Height="137" VerticalAlignment="Top" Width="300" Background="#BF232323" MouseDown="Clicked" Visibility="Hidden">
+            <Image x:Name="image1" HorizontalAlignment="Center" Height="64" Margin="0" VerticalAlignment="Center" Width="64" Source="Resources/Upgrade.png" MouseDown="Clicked" />
+        </Grid>
     </Grid>
 </UserControl>

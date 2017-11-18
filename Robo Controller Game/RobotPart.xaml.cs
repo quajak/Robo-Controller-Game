@@ -25,6 +25,7 @@ namespace Robo_Controller_Game
     {
         private string BaseText;
         private bool beingSold = false;
+        public bool upgradeable = false;
         private int cost;
 
         public bool BeingSold
@@ -99,6 +100,16 @@ namespace Robo_Controller_Game
         {
             if (Click != null)
                 this.Click(this, e);
+        }
+
+        private void Grid_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (!beingSold) overlay.Visibility = Visibility.Visible;
+        }
+
+        private void UserControl_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (!beingSold) overlay.Visibility = Visibility.Hidden;
         }
     }
 }

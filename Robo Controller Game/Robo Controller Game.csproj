@@ -108,13 +108,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\CPUBasic.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\BasicCasing.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\BasicCasing.jpg" />
+    <Resource Include="Resources\Upgrade.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
