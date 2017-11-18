@@ -94,6 +94,9 @@ namespace Robo_Controller_Game
             }
         }
 
+        /// <summary>
+        /// This Event is called when any part of the robopart is clicked!
+        /// </summary>
         public event EventHandler Click;
 
         private void Clicked(object sender, MouseButtonEventArgs e)
