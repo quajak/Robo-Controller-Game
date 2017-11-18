@@ -52,6 +52,7 @@ namespace Robo_Controller_Game
                 {
                     Name = part.id
                 };
+                robotPart.Click += HandleUpdate;
                 robotPart.HorizontalAlignment = HorizontalAlignment.Left;
                 Grid.SetColumn(robotPart, 0);
                 Grid.SetRow(robotPart, c++);
@@ -156,6 +157,10 @@ namespace Robo_Controller_Game
         private void UpdatePlayerUI()
         {
             MoneyCounter.Content = "Money: " + gameController.player.money.ToString();
+        }
+
+        private void HandleUpdate(object sender, EventArgs e)
+        {
         }
     }
 }
