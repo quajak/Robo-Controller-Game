@@ -5,26 +5,33 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Robo_Controller_Game"
         mc:Ignorable="d"
-        Title="MainWindow" Height="573.095" Width="1369.549">
-    <Canvas>
-        <Button x:Name="button" Content="Run!" HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="217" Click="Button_Click" Canvas.Left="710" Canvas.Top="319" />
+        Title="MainWindow" Height="484.595" Width="1299.049" Background="{DynamicResource GridBackground}">
+    <Window.Resources>
+        <SolidColorBrush x:Key="ButtonBackground" Color="#FF7C7C7C" />
+        <SolidColorBrush x:Key="ButtonBorder" Color="#FF0B3804" />
+        <SolidColorBrush x:Key="ButtonText" Color="#FF0E4B19" />
+        <SolidColorBrush x:Key="GridBackground" Color="#FF7E7E7E" />
+    </Window.Resources>
+    <Canvas Background="#FF4D4D4D">
+        <Button x:Name="button" Content="Run!" HorizontalAlignment="Left" Height="25" VerticalAlignment="Top" Width="138" Click="Button_Click" Canvas.Left="789" Canvas.Top="284" Foreground="{DynamicResource ButtonText}" Background="{DynamicResource ButtonBackground}" BorderBrush="{DynamicResource ButtonBorder}" />
 
-        <TextBox x:Name="codeView" Height="269" Canvas.Left="710" TextWrapping="Wrap" Canvas.Top="10" Width="217" RenderTransformOrigin="0.5,0.5" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="True" Background="#FF9C9C9C" TextChanged="TextBox_TextChanged">
+        <TextBox x:Name="codeView" Height="269" Canvas.Left="693" TextWrapping="Wrap" Canvas.Top="10" Width="234" RenderTransformOrigin="0.5,0.5" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="True" Background="#FF9C9C9C" TextChanged="TextBox_TextChanged">
         </TextBox>
-        <ProgressBar x:Name="CPUProgressBar" Height="18" Canvas.Left="1016" Canvas.Top="318" Width="336" />
-        <Button x:Name="clearCode" Content="Clear" Canvas.Left="710" Canvas.Top="284" Width="75" Height="26" Click="ClearCode_Click" />
-        <Label x:Name="robotInfoTitle" Content="Robot Info Title" Canvas.Left="38" Canvas.Top="10" Width="177" FontWeight="Bold" />
+        <ProgressBar x:Name="CPUProgressBar" Height="25" Canvas.Left="932" Canvas.Top="284" Width="346" />
+        <Button x:Name="clearCode" Content="Clear" Canvas.Left="693" Canvas.Top="283" Width="91" Height="26" Click="ClearCode_Click" Foreground="{DynamicResource ButtonText}" Background="{DynamicResource ButtonBackground}" BorderBrush="{DynamicResource ButtonBorder}" />
+        <Label x:Name="robotInfoTitle" Content="Robot Info Title" Canvas.Left="38" Canvas.Top="10" Width="177" FontWeight="Bold" Foreground="#FF040404" />
         <Grid VerticalAlignment="Top" HorizontalAlignment="Left" Canvas.Left="21" Canvas.Top="36">
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Height="400">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Height="400" Width="320">
                 <Grid x:Name="robotPartGrid" Canvas.Left="38" Canvas.Top="41" Width="331" HorizontalAlignment="Left" VerticalAlignment="Top" ScrollViewer.CanContentScroll="True">
                 </Grid>
             </ScrollViewer>
         </Grid>
-        <Canvas x:Name="GameBoard" HorizontalAlignment="Left" Height="313" VerticalAlignment="Top" Width="345" Initialized="GameBoard_Initialized" MaxWidth="345" MaxHeight="313" ClipToBounds="True" Canvas.Left="1007" />
-        <Grid x:Name="robotPartGridSecond" Height="400" Canvas.Left="374" Canvas.Top="41" Width="331" HorizontalAlignment="Left" VerticalAlignment="Top" />
-        <Border BorderBrush="Black" BorderThickness="1" Height="91" Canvas.Left="38" Canvas.Top="441" Width="326">
-            <Label x:Name="MoneyCounter" Content="Money:" />
+        <Canvas x:Name="GameBoard" HorizontalAlignment="Left" Height="269" VerticalAlignment="Top" Width="346" Initialized="GameBoard_Initialized" MaxWidth="345" MaxHeight="313" ClipToBounds="True" Canvas.Left="932" Background="{DynamicResource GridBackground}" Canvas.Top="10" />
+        <Grid x:Name="robotPartGridSecond" Height="400" Canvas.Left="346" Canvas.Top="36" Width="320" HorizontalAlignment="Left" VerticalAlignment="Top" />
+        <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Height="121" Canvas.Left="693" Canvas.Top="315" Width="585" Background="{DynamicResource ButtonBackground}">
+            <Label x:Name="MoneyCounter" Content="Money:" Foreground="{DynamicResource ButtonText}" />
         </Border>
+        <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Height="497" Canvas.Left="671" Canvas.Top="-18" Width="3" Background="{DynamicResource ButtonBorder}" />
     </Canvas>
 </Window>

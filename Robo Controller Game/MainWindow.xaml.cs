@@ -52,6 +52,7 @@ namespace Robo_Controller_Game
                 {
                     Name = part.id
                 };
+                robotPart.HorizontalAlignment = HorizontalAlignment.Left;
                 Grid.SetColumn(robotPart, 0);
                 Grid.SetRow(robotPart, c++);
                 robotPartGrid.Children.Add(robotPart);
@@ -74,7 +75,7 @@ namespace Robo_Controller_Game
                     BorderBrush = Brushes.DarkOliveGreen,
                     BorderThickness = new Thickness(2),
                     Background = Brushes.DarkGray,
-                    HorizontalAlignment = HorizontalAlignment.Center
+                    HorizontalAlignment = HorizontalAlignment.Left
                 };
 
                 addPart.Click += OpenShop;
@@ -98,7 +99,8 @@ namespace Robo_Controller_Game
                 robotPartGridSecond.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(140) });
                 RobotPart robotPart = new RobotPart(i.name, i.Description, i.price, i.image)
                 {
-                    BeingSold = true
+                    BeingSold = true,
+                    HorizontalAlignment = HorizontalAlignment.Left
                 };
                 Grid.SetColumn(robotPart, 0);
                 Grid.SetRow(robotPart, c++);
