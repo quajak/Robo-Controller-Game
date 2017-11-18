@@ -22,6 +22,7 @@ namespace Engine
         public readonly int drawingLevel;
         public int price;
         public EquipmentType type;
+        public ImageSource robotImage;
 
         public string Description
         {
@@ -32,7 +33,9 @@ namespace Engine
             }
         }
 
-        public RobotEquipment(string ID, string Name, Robot Robot, ImageSource imageSource, int DrawingLevel, int Price = 0, EquipmentType Type = EquipmentType.basic)
+        public RobotEquipment(string ID, string Name, Robot Robot, ImageSource imageSource,
+            int DrawingLevel, int Price = 0, EquipmentType Type = EquipmentType.basic,
+            ImageSource robotImageSource = null)
         {
             type = Type;
             price = Price;
@@ -40,6 +43,7 @@ namespace Engine
             id = ID;
             name = Name;
             robot = Robot;
+            robotImage = robotImageSource;
             drawingLevel = DrawingLevel;
         }
 
@@ -76,7 +80,8 @@ namespace Engine
     internal class BasicCasing : RobotEquipment
     {
         public BasicCasing(string ID, Robot robot) : base(ID, "Casing MK 1", robot,
-            BitmapToImageSource(Resources.BasicCasingRobot), 5)
+            BitmapToImageSource(Resources.BasicCasingRobot), 5, robotImageSource:
+            BitmapToImageSource(Resources.BasicCasingRobot))
         {
         }
 
@@ -97,14 +102,14 @@ namespace Engine
         private int miningSpeed;
         private double efficency;
 
-        public Drill(string name, string id, Robot robot, ImageSource image, int cost, int MiningSpeed, double Efficiency) : base(id, name, robot, image, 4, cost, EquipmentType.mining)
+        public Drill(string name, string id, Robot robot, ImageSource image, int cost, int MiningSpeed, double Efficiency, ImageSource robotImage) : base(id, name, robot, image, 4, cost, EquipmentType.mining, robotImageSource: robotImage)
         {
         }
     }
 
     internal class BasicDrill : Drill
     {
-        public BasicDrill(Robot robot) : base("Drill MK 1", "BasicDrill", robot, BitmapToImageSource(Resources.DrillBasic), 10, 1, 0.1)
+        public BasicDrill(Robot robot) : base("Drill MK 1", "BasicDrill", robot, BitmapToImageSource(Resources.DrillBasic), 10, 1, 0.1, BitmapToImageSource(Resources.DrillBasicRobot))
         {
         }
 

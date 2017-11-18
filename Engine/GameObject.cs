@@ -98,6 +98,8 @@ namespace Engine
 
     public abstract class ImageEntity : Entity
     {
+        public bool updateImage = false;
+
         public ImageEntity(int ID, Color Color, Point Position) : base(ID, Color, Position)
         {
         }
@@ -123,7 +125,7 @@ namespace Engine
                 g.DrawRectangle(System.Drawing.Pens.Transparent, 0, 0, 64, 64);
                 foreach (RobotEquipment part in equipment)
                 {
-                    g.DrawImage(ImageWpfToGdi2(part.image), 0, 0);
+                    g.DrawImage(ImageWpfToGdi2(part.robotImage), 0, 0);
                 }
             }
 

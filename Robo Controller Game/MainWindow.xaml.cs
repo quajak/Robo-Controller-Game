@@ -112,21 +112,23 @@ namespace Robo_Controller_Game
         {
             string id = ((Control)sender).Name;
             RobotEquipment bought = gameController.toBuy.Find(t => t.id == id);
-            //TODO: Handle money
             if (bought.price <= gameController.player.money)
             {
                 gameController.player.money -= bought.price;
                 gameController.toBuy.Remove(bought);
                 gameController.activeEquipment.Add(bought);
+                //TODO: HANDLE UPGRADES
+                gameController.robot.equipment.Add(bought);
             }
-            else
-
-                MessageBox.Show($"You do not have enough money! This costs{bought.price}");
+            else MessageBox.Show($"You do not have enough money! This costs{bought.price}");
 
             //Refresh
+            gameController.robot.updateImage = true;
+            gameController.robot.updated = true;
             UpdatePlayerUI();
             OpenShop(sender, e);
             ShowRobotEquipment();
+            gameController.renderer.Update();
         }
 
         private void GameBoard_Initialized(object sender, EventArgs e)

@@ -114,6 +114,14 @@ namespace Engine
            {
                if (g.updated)
                {
+                   if (g is ImageEntity image && image.updateImage)
+                   {
+                       //Find image
+                       images.First(i => i.Name == "f" + image.id).Source =
+                        BitmapToImageSource(new System.Drawing.Bitmap(image.CurrentImage()));
+                       image.updateImage = false;
+                   }
+
                    if (g.animate)
                    {
                        if (g.animationType == AnimationType.movement) AnimatePositionChange(g);
