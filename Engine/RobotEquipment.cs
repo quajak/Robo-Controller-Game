@@ -76,7 +76,7 @@ namespace Engine
     internal class BasicCasing : RobotEquipment
     {
         public BasicCasing(string ID, Robot robot) : base(ID, "Casing MK 1", robot,
-            BitmapToImageSource(Resources.BasicCasing), 5)
+            BitmapToImageSource(Resources.BasicCasingRobot), 5)
         {
         }
 
