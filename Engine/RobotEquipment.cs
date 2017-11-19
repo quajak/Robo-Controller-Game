@@ -138,7 +138,8 @@ namespace Engine
 
     internal class BasicRAMMK1 : RAM
     {
-        public BasicRAMMK1(Robot robot) : base("Basic RAM MK 1", "BASICRAMMK1", robot, BtIS(Resources.BASICRAMMK1), -1, 64, IsUpgrade: false)
+        public BasicRAMMK1(Robot robot) : base("Basic RAM MK 1", "BASICRAMMK1", robot,
+            BtIS(Resources.BASICRAMMK1), -1, 64, IsUpgrade: false, upgrade: new BasicRAMMK2(robot))
         {
         }
 
@@ -150,6 +151,24 @@ namespace Engine
         protected override void UpdateDescription()
         {
             description = "This is the simplest RAM. It has 64 bytes of memory.";
+        }
+    }
+
+    internal class BasicRAMMK2 : RAM
+    {
+        public BasicRAMMK2(Robot robot) : base("Basic RAM MK 2", "BASICRAMMK2", robot,
+            BtIS(Resources.BASICRAMMK2), 50, 128, IsUpgrade: true)
+        {
+        }
+
+        public override void SettupRobot()
+        {
+            robot.MAXRAMSize = 128;
+        }
+
+        protected override void UpdateDescription()
+        {
+            description = "This is a slightly improved version of the simplest RAM. It has 128 bytes of memory.";
         }
     }
 

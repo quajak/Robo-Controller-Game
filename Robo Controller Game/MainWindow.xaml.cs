@@ -48,10 +48,7 @@ namespace Robo_Controller_Game
 
         private void ShowRobotEquipment()
         {
-            //Clear
-            robotPartGrid.Children.Clear();
-            robotPartGrid.RowDefinitions.Clear();
-            robotPartGrid.ColumnDefinitions.Clear();
+            ClearSecondView();
             //Setup
             int c = 0;
             foreach (RobotEquipment part in gameController.activeEquipment)
@@ -102,10 +99,7 @@ namespace Robo_Controller_Game
 
         private void OpenShop(object sender, EventArgs e)
         {
-            //Clear the grid
-            robotPartGridSecond.Children.Clear();
-            robotPartGridSecond.RowDefinitions.Clear();
-            robotPartGridSecond.ColumnDefinitions.Clear();
+            ClearSecondView();
             //Display
             int c = 0;
             gameController.toBuy.ForEach(i =>
@@ -127,10 +121,7 @@ namespace Robo_Controller_Game
 
         private void ShowUpgrade(RobotEquipment toShow)
         {
-            //Clear the grid
-            robotPartGridSecond.Children.Clear();
-            robotPartGridSecond.RowDefinitions.Clear();
-            robotPartGridSecond.ColumnDefinitions.Clear();
+            ClearSecondView();
             //Display
             robotPartGridSecond.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(140) });
             RobotPart robotPart = new RobotPart(toShow.name, toShow.Description, toShow.price, toShow.image)
@@ -165,7 +156,7 @@ namespace Robo_Controller_Game
                 gameController.activeEquipment.Add(bought);
                 gameController.robot.equipment.Add(bought);
             }
-            else MessageBox.Show($"You do not have enough money! This costs{bought.price}");
+            else MessageBox.Show($"You do not have enough money! This costs {bought.price}");
 
             //Refresh
             bought.SettupRobot();
@@ -174,6 +165,14 @@ namespace Robo_Controller_Game
             UpdatePlayerUI();
             ShowRobotEquipment();
             gameController.renderer.Update();
+        }
+
+        private void ClearSecondView()
+        {
+            //Clear the grid
+            robotPartGridSecond.Children.Clear();
+            robotPartGridSecond.RowDefinitions.Clear();
+            robotPartGridSecond.ColumnDefinitions.Clear();
         }
 
         private void GameBoard_Initialized(object sender, EventArgs e)

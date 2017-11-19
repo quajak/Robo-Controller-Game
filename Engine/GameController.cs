@@ -67,18 +67,21 @@ namespace Engine
 
         private void InitialRobotInfo()
         {
-            //Setup game state
+            #region Setup game state
+
             {
-                int EquipmentIDCounter = 0;
-                robotEquipment.Add(new BasicCPU("ep" + EquipmentIDCounter++.ToString(), robot));
-                robotEquipment.Add(new BasicCasing("ep" + EquipmentIDCounter++.ToString(), robot));
+                robotEquipment.Add(new BasicCPU("BasicCPUMk1", robot));
+                robotEquipment.Add(new BasicCasing("BasicCasingMk1", robot));
                 robotEquipment.Add(new BasicRAMMK1(robot));
                 initalEquipment = new List<RobotEquipment>(robotEquipment);
                 activeEquipment = new List<RobotEquipment>(initalEquipment);
                 robotEquipment.Add(new BasicDrill(robot));
                 robotEquipment.Add(new BasicCasingMK2(robot));
+                robotEquipment.Add(new BasicRAMMK2(robot));
                 toBuy = new List<RobotEquipment>(robotEquipment.Where(e => activeEquipment.FindIndex(a => a.id == e.id) == -1));
             }
+
+            #endregion Setup game state
         }
 
         private void SettupRobotInfo()
