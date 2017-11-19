@@ -120,6 +120,9 @@ namespace Engine
                        images.First(i => i.Name == "f" + image.id).Source =
                         BitmapToImageSource(new System.Drawing.Bitmap(image.CurrentImage()));
                        image.updateImage = false;
+                       g.animate = false;
+                       g.updated = false;
+                       return;
                    }
 
                    if (g.animate)
