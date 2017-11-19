@@ -23,6 +23,9 @@ namespace Engine
         public int price;
         public EquipmentType type;
         public ImageSource robotImage;
+        public bool IsUpgrade;
+
+        public RobotEquipment upgrade; //TODO: Allow multiple robot equipment upgrae possibilites?
 
         public string Description
         {
@@ -35,7 +38,7 @@ namespace Engine
 
         public RobotEquipment(string ID, string Name, Robot Robot, ImageSource imageSource,
             int DrawingLevel, int Price = 0, EquipmentType Type = EquipmentType.basic,
-            ImageSource robotImageSource = null)
+            ImageSource robotImageSource = null, RobotEquipment Upgrade = null, bool isUpgrade = true)
         {
             type = Type;
             price = Price;
@@ -45,6 +48,8 @@ namespace Engine
             robot = Robot;
             robotImage = robotImageSource;
             drawingLevel = DrawingLevel;
+            IsUpgrade = isUpgrade;
+            if (Upgrade != null) upgrade = Upgrade;
         }
 
         protected abstract void UpdateDescription();
@@ -81,7 +86,7 @@ namespace Engine
     {
         public BasicCasing(string ID, Robot robot) : base(ID, "Casing MK 1", robot,
             BitmapToImageSource(Resources.BasicCasingRobot), 5, robotImageSource:
-            BitmapToImageSource(Resources.BasicCasingRobot))
+            BitmapToImageSource(Resources.BasicCasingRobot), Upgrade: new BasicCasingMK2(robot))
         {
         }
 
@@ -97,19 +102,43 @@ namespace Engine
         }
     }
 
+    internal class BasicCasingMK2 : RobotEquipment
+    {
+        public BasicCasingMK2(Robot robot) : base("BasicCasingMK2", "Basic Casing MK 2", robot,
+            BitmapToImageSource(Resources.Basic2CasingRobot), 5, 80,
+            robotImageSource: BitmapToImageSource(Resources.Basic2CasingRobot))
+        {
+        }
+
+        protected override void SettupRobot()
+        {
+            robot.health = 20;
+        }
+
+        protected override void UpdateDescription()
+        {
+            description = "This is a cheap and simple casing made out of a mix of iron and aluminium."
+                + "It gives the robot 20 heath points";
+        }
+    }
+
     internal abstract class Drill : RobotEquipment
     {
         private int miningSpeed;
         private double efficency;
 
-        public Drill(string name, string id, Robot robot, ImageSource image, int cost, int MiningSpeed, double Efficiency, ImageSource robotImage) : base(id, name, robot, image, 4, cost, EquipmentType.mining, robotImageSource: robotImage)
+        public Drill(string name, string id, Robot robot, ImageSource image, int cost, int MiningSpeed, double Efficiency, ImageSource robotImage, bool IsUpgrade)
+            : base(id, name, robot, image, 4, cost, EquipmentType.mining, robotImageSource: robotImage,
+                  isUpgrade: IsUpgrade)
         {
         }
     }
 
     internal class BasicDrill : Drill
     {
-        public BasicDrill(Robot robot) : base("Drill MK 1", "BasicDrill", robot, BitmapToImageSource(Resources.DrillBasic), 10, 1, 0.1, BitmapToImageSource(Resources.DrillBasicRobot))
+        public BasicDrill(Robot robot) : base("Drill MK 1", "BasicDrill", robot,
+            BitmapToImageSource(Resources.DrillBasic), 10, 1, 0.1,
+            BitmapToImageSource(Resources.DrillBasicRobot), false)
         {
         }
 

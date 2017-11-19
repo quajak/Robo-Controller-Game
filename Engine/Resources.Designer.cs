@@ -63,6 +63,16 @@ namespace Engine {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Basic2CasingRobot {
+            get {
+                object obj = ResourceManager.GetObject("Basic2CasingRobot", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap BasicCasingRobot {
             get {
                 object obj = ResourceManager.GetObject("BasicCasingRobot", resourceCulture);

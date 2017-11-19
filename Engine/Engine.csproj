@@ -87,5 +87,8 @@
   <ItemGroup>
     <None Include="Resources\Upgrade.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Basic2CasingRobot.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -67,6 +67,7 @@ namespace Engine
                 initalEquipment = new List<RobotEquipment>(robotEquipment);
                 activeEquipment = new List<RobotEquipment>(initalEquipment);
                 robotEquipment.Add(new BasicDrill(robot));
+                robotEquipment.Add(new BasicCasingMK2(robot));
                 toBuy = new List<RobotEquipment>(robotEquipment.Where(e => activeEquipment.FindIndex(a => a.id == e.id) == -1));
             }
         }

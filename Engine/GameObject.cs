@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -115,15 +116,15 @@ namespace Engine
         public override System.Drawing.Image CurrentImage()
         {
             //Sort the equipment
-            equipment = equipment.Where(e => e.drawingLevel != -1).ToList();
-            equipment.Sort((a, b) => a.drawingLevel - b.drawingLevel);
+            List<RobotEquipment> Equipment = equipment.Where(e => e.drawingLevel != -1).ToList();
+            Equipment.Sort((a, b) => a.drawingLevel - b.drawingLevel);
 
             System.Drawing.Image image = new System.Drawing.Bitmap(64, 64);
 
             using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(image))
             {
                 g.DrawRectangle(System.Drawing.Pens.Transparent, 0, 0, 64, 64);
-                foreach (RobotEquipment part in equipment)
+                foreach (RobotEquipment part in Equipment)
                 {
                     g.DrawImage(ImageWpfToGdi2(part.robotImage), 0, 0);
                 }
@@ -146,7 +147,8 @@ namespace Engine
 
         public Robot(int id, Point start, GameController gameController, List<RobotEquipment> parts) : base(id, Colors.Red, start)
         {
-            equipment = parts;
+            equipment = new List<RobotEquipment>(parts);
+
             EnterField = e =>
             {
                 Vector movement = LanguageExecuter.GetOffset(e.Angle, e.position, gameController.gameWorld, out MapObject field);

@@ -97,6 +97,7 @@ namespace Robo_Controller_Game
             int c = 0;
             gameController.toBuy.ForEach(i =>
             {
+                if (i.IsUpgrade) return;
                 robotPartGridSecond.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(140) });
                 RobotPart robotPart = new RobotPart(i.name, i.Description, i.price, i.image)
                 {
@@ -111,6 +112,26 @@ namespace Robo_Controller_Game
             });
         }
 
+        private void ShowUpgrade(RobotEquipment toShow)
+        {
+            //Clear the grid
+            robotPartGridSecond.Children.Clear();
+            robotPartGridSecond.RowDefinitions.Clear();
+            robotPartGridSecond.ColumnDefinitions.Clear();
+            //Display
+            robotPartGridSecond.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(140) });
+            RobotPart robotPart = new RobotPart(toShow.name, toShow.Description, toShow.price, toShow.image)
+            {
+                BeingSold = true,
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
+            Grid.SetColumn(robotPart, 0);
+            Grid.SetRow(robotPart, 0);
+            robotPart.Click += ShopClick;
+            robotPart.Name = toShow.id;
+            robotPartGridSecond.Children.Add(robotPart);
+        }
+
         private void ShopClick(object sender, EventArgs e)
         {
             string id = ((Control)sender).Name;
@@ -119,8 +140,16 @@ namespace Robo_Controller_Game
             {
                 gameController.player.money -= bought.price;
                 gameController.toBuy.Remove(bought);
+                //if upgrade
+                RobotEquipment item = gameController.activeEquipment.Find(r => r.upgrade != null && r.upgrade.id == bought.id);
+                if (item != null)
+                {
+                    //Remove old version
+                    gameController.activeEquipment.Remove(item);
+                    gameController.robot.equipment.Remove(item);
+                }
+                //Add to lists
                 gameController.activeEquipment.Add(bought);
-                //TODO: HANDLE UPGRADES
                 gameController.robot.equipment.Add(bought);
             }
             else MessageBox.Show($"You do not have enough money! This costs{bought.price}");
@@ -161,6 +190,10 @@ namespace Robo_Controller_Game
 
         private void HandleUpdate(object sender, EventArgs e)
         {
+            RobotPart clicked = sender as RobotPart;
+            RobotEquipment chosen = gameController.robot.equipment.ToList().Find(p => p.id == clicked.Name);
+            if (chosen.upgrade == null) MessageBox.Show("There is no upgradeable version!");
+            else ShowUpgrade(chosen.upgrade);
         }
     }
 }
