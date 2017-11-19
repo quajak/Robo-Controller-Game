@@ -111,6 +111,7 @@ namespace Engine
     public class Robot : ImageEntity
     {
         public int CPUSpeed = 1000; //Milliseconds per command
+        public int MAXRAMSize;
         public List<RobotEquipment> equipment;
 
         public override System.Drawing.Image CurrentImage()

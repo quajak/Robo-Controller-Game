@@ -50,9 +50,17 @@ namespace Engine
             EventHandler eventHandler = new EventHandler(HandleCommandTime);
             commandTimer.Tick += eventHandler;
             commandTimer.Start();
-            InitialRobotInfo();
 
+            InitialRobotInfo();
             robot = new Robot(entityCounter++, start, this, activeEquipment);
+            //Link robot to equipment
+            activeEquipment.ForEach(e => e.robot = robot);
+            robotEquipment.ForEach(e => e.robot = robot);
+            initalEquipment.ForEach(e => e.robot = robot);
+
+            //Calculate robot values
+            robot.equipment.ForEach(e => e.SettupRobot());
+
             renderer.AddEntity(robot, isImage: true);
             SettupRobotInfo();
         }
@@ -64,6 +72,7 @@ namespace Engine
                 int EquipmentIDCounter = 0;
                 robotEquipment.Add(new BasicCPU("ep" + EquipmentIDCounter++.ToString(), robot));
                 robotEquipment.Add(new BasicCasing("ep" + EquipmentIDCounter++.ToString(), robot));
+                robotEquipment.Add(new BasicRAMMK1(robot));
                 initalEquipment = new List<RobotEquipment>(robotEquipment);
                 activeEquipment = new List<RobotEquipment>(initalEquipment);
                 robotEquipment.Add(new BasicDrill(robot));

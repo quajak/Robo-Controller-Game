@@ -10,13 +10,13 @@ using System.Windows.Media.Imaging;
 
 namespace Engine
 {
-    public enum EquipmentType { basic, mining };
+    public enum EquipmentType { basic, mining, ram };
 
     public abstract class RobotEquipment
     {
         public string name;
         public readonly string id;
-        protected Robot robot;
+        public Robot robot;
         protected string description;
         public ImageSource image;
         public readonly int drawingLevel;
@@ -54,9 +54,9 @@ namespace Engine
 
         protected abstract void UpdateDescription();
 
-        protected abstract void SettupRobot();
+        public abstract void SettupRobot();
 
-        protected static ImageSource BitmapToImageSource(Bitmap image)
+        protected static ImageSource BtIS(Bitmap image)
         {
             return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(image.GetHbitmap(),
                 IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
@@ -66,7 +66,7 @@ namespace Engine
     internal class BasicCPU : RobotEquipment
     {
         public BasicCPU(string ID, Robot robot) : base(ID, "CPU MK 1", robot,
-            BitmapToImageSource(Resources.CPUBasic), -1)
+            BtIS(Resources.CPUBasic), -1)
         {
         }
 
@@ -76,7 +76,7 @@ namespace Engine
                 "The processor speed is one command a second";
         }
 
-        protected override void SettupRobot()
+        public override void SettupRobot()
         {
             robot.CPUSpeed = 1000;
         }
@@ -85,12 +85,12 @@ namespace Engine
     internal class BasicCasing : RobotEquipment
     {
         public BasicCasing(string ID, Robot robot) : base(ID, "Casing MK 1", robot,
-            BitmapToImageSource(Resources.BasicCasingRobot), 5, robotImageSource:
-            BitmapToImageSource(Resources.BasicCasingRobot), Upgrade: new BasicCasingMK2(robot))
+            BtIS(Resources.BasicCasingRobot), 5, robotImageSource:
+            BtIS(Resources.BasicCasingRobot), Upgrade: new BasicCasingMK2(robot))
         {
         }
 
-        protected override void SettupRobot()
+        public override void SettupRobot()
         {
             robot.health = 10;
         }
@@ -105,12 +105,12 @@ namespace Engine
     internal class BasicCasingMK2 : RobotEquipment
     {
         public BasicCasingMK2(Robot robot) : base("BasicCasingMK2", "Basic Casing MK 2", robot,
-            BitmapToImageSource(Resources.Basic2CasingRobot), 5, 80,
-            robotImageSource: BitmapToImageSource(Resources.Basic2CasingRobot))
+            BtIS(Resources.Basic2CasingRobot), 5, 80,
+            robotImageSource: BtIS(Resources.Basic2CasingRobot))
         {
         }
 
-        protected override void SettupRobot()
+        public override void SettupRobot()
         {
             robot.health = 20;
         }
@@ -121,6 +121,41 @@ namespace Engine
                 + "It gives the robot 20 heath points";
         }
     }
+
+    #region RAM
+
+    internal abstract class RAM : RobotEquipment
+    {
+        private int RAMSize;
+
+        public RAM(string Name, string id, Robot robot, ImageSource image, int cost, int _RAMSize,
+            RAM upgrade = null, bool IsUpgrade = true) :
+            base(id, Name, robot, image, -1, cost, EquipmentType.ram, Upgrade: upgrade, isUpgrade: IsUpgrade)
+        {
+            RAMSize = _RAMSize;
+        }
+    }
+
+    internal class BasicRAMMK1 : RAM
+    {
+        public BasicRAMMK1(Robot robot) : base("Basic RAM MK 1", "BASICRAMMK1", robot, BtIS(Resources.BASICRAMMK1), -1, 64, IsUpgrade: false)
+        {
+        }
+
+        public override void SettupRobot()
+        {
+            robot.MAXRAMSize = 64;
+        }
+
+        protected override void UpdateDescription()
+        {
+            description = "This is the simplest RAM. It has 64 bytes of memory.";
+        }
+    }
+
+    #endregion RAM
+
+    #region Drill
 
     internal abstract class Drill : RobotEquipment
     {
@@ -137,12 +172,12 @@ namespace Engine
     internal class BasicDrill : Drill
     {
         public BasicDrill(Robot robot) : base("Drill MK 1", "BasicDrill", robot,
-            BitmapToImageSource(Resources.DrillBasic), 10, 1, 0.1,
-            BitmapToImageSource(Resources.DrillBasicRobot), false)
+            BtIS(Resources.DrillBasic), 10, 1, 0.1,
+            BtIS(Resources.DrillBasicRobot), false)
         {
         }
 
-        protected override void SettupRobot()
+        public override void SettupRobot()
         {
         }
 
@@ -151,4 +186,6 @@ namespace Engine
             description = "This is the simplest drill. It allows the robot to mine, using the mine command. It has a mining speed of 1.";
         }
     }
+
+    #endregion Drill
 }

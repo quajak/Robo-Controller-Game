@@ -23,6 +23,19 @@ namespace Robo_Controller_Game
     public partial class MainWindow : Window
     {
         private GameController gameController;
+        private int _ByteCounter;
+
+        private int ByteCounter
+        {
+            get { return _ByteCounter; }
+            set
+            {
+                _ByteCounter = value;
+                byteCounter.Content = "Bytes: " + _ByteCounter + "/" + gameController.robot.MAXRAMSize;
+                if (gameController.robot.MAXRAMSize < _ByteCounter) byteCounter.Foreground = Brushes.Red;
+                else byteCounter.Foreground = (Brush)FindResource("ButtonText");
+            }
+        }
 
         public MainWindow()
         {
@@ -125,10 +138,10 @@ namespace Robo_Controller_Game
                 BeingSold = true,
                 HorizontalAlignment = HorizontalAlignment.Left
             };
+            robotPart.Name = toShow.id;
             Grid.SetColumn(robotPart, 0);
             Grid.SetRow(robotPart, 0);
             robotPart.Click += ShopClick;
-            robotPart.Name = toShow.id;
             robotPartGridSecond.Children.Add(robotPart);
         }
 
@@ -155,10 +168,10 @@ namespace Robo_Controller_Game
             else MessageBox.Show($"You do not have enough money! This costs{bought.price}");
 
             //Refresh
+            bought.SettupRobot();
             gameController.robot.updateImage = true;
             gameController.robot.updated = true;
             UpdatePlayerUI();
-            OpenShop(sender, e);
             ShowRobotEquipment();
             gameController.renderer.Update();
         }
@@ -167,14 +180,20 @@ namespace Robo_Controller_Game
         {
         }
 
+        //RUN CODE BUtton
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            gameController.RunCode(codeView.Text, out string Error);
-            if (Error != "") MessageBox.Show(Error);
+            if (gameController.robot.MAXRAMSize >= _ByteCounter)
+            {
+                gameController.RunCode(codeView.Text, out string Error);
+                if (Error != "") MessageBox.Show(Error);
+            }
+            else MessageBox.Show("You have to little ram to run this program!");
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            ByteCounter = ((TextBox)sender).Text.Length * sizeof(char);
         }
 
         private void ClearCode_Click(object sender, RoutedEventArgs e)
@@ -185,6 +204,7 @@ namespace Robo_Controller_Game
 
         private void UpdatePlayerUI()
         {
+            ByteCounter = codeView.Text.Length * sizeof(char);
             MoneyCounter.Content = "Money: " + gameController.player.money.ToString();
         }
 
