@@ -152,7 +152,7 @@ namespace Engine
 
             EnterField = e =>
             {
-                Vector movement = LanguageExecuter.GetOffset(e.Angle, e.position, gameController.gameWorld, out MapObject field);
+                Vector movement = Programm.GetOffset(e.Angle, e.position, gameController.gameWorld, out MapObject field);
                 if (movement == new Vector(0, 0)) return true;
                 if (!field.blocking && field.entities.TrueForAll(E => !E.blocking))
                 {
@@ -163,10 +163,6 @@ namespace Engine
                     //Now move robot on field
 
                     e.position += movement;
-
-                    e.updated = true;
-                    e.animationType = AnimationType.movement;
-                    e.animate = true;
                     return true;
                 }
                 else

@@ -17,7 +17,7 @@ namespace Engine
         public Robot robot;
         public Renderer renderer;
         private int entityCounter = 0;
-        private LanguageExecuter languageParser;
+        private Programm runningProgramm;
 
         private DispatcherTimer commandTimer;
         private int timeElapsed = 0;
@@ -39,7 +39,7 @@ namespace Engine
 
             CPUprogressBar = CPUProgressBar;
             Point start = new Point(0, 0);
-            languageParser = new LanguageExecuter(this);
+            runningProgramm = new Programm(this);
             gameWorld = new GameWorld(width, height, start);
             renderer = new Renderer(this, GameBoard, gameWorld.map.Cast<GameObject>().ToList());
 
@@ -92,28 +92,20 @@ namespace Engine
 
         private void HandleCommandTime(object obj, EventArgs args)
         {
-            if (languageParser.commands.Count + languageParser.actions.Count == 0 || inAnimation) return;
+            if (runningProgramm.Finished || inAnimation) return;
             timeElapsed += 10;
             string error = "";
             if (timeElapsed >= robot.CPUSpeed)
             {
                 timeElapsed = 0;
-                if (languageParser.actions.Count != 0)
-                {
-                    languageParser.ExecuteAction(out error);
-                }
-                else
-                {
-                    languageParser.ExecuteFile(out error);
-                }
+                runningProgramm.ExecuteLine(out error);
                 renderer.Update();
             }
             if (error != "")
             {
                 MessageBox.Show(error);
-                //Clear languageParser
-                languageParser.actions.Clear();
-                languageParser.commands.Clear();
+                //Clear Program
+                runningProgramm.Clear();
             }
             try
             {
@@ -128,8 +120,8 @@ namespace Engine
         public bool RunCode(string code, out string Error)
         {
             Error = "";
-            if (languageParser.commands.Count + languageParser.actions.Count != 0 || inAnimation) return true;
-            if (!languageParser.ParseText(code, out string error))
+            if (!runningProgramm.Finished || inAnimation) return true;
+            if (!runningProgramm.Parse(code, out string error))
             {
                 Error = "Input is incorrect: " + error;
                 return false;
