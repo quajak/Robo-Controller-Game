@@ -38,9 +38,9 @@ namespace Engine
             player = new Player();
 
             CPUprogressBar = CPUProgressBar;
-            Point start = new Point(0, 0);
+            Point robotStartPosition = new Point(1, 1);
             runningProgramm = new Programm(this);
-            gameWorld = new GameWorld(width, height, start);
+            gameWorld = new GameWorld(width, height, robotStartPosition);
             renderer = new Renderer(this, GameBoard, gameWorld.map.Cast<GameObject>().ToList());
 
             commandTimer = new DispatcherTimer
@@ -52,7 +52,7 @@ namespace Engine
             commandTimer.Start();
 
             InitialRobotInfo();
-            robot = new Robot(entityCounter++, start, this, activeEquipment);
+            robot = new Robot(entityCounter++, robotStartPosition, this, activeEquipment);
             //Link robot to equipment
             activeEquipment.ForEach(e => e.robot = robot);
             robotEquipment.ForEach(e => e.robot = robot);

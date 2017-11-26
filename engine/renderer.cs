@@ -120,6 +120,9 @@ namespace Engine
                        images.First(i => i.Name == "f" + image.id).Source =
                         BitmapToImageSource(new System.Drawing.Bitmap(image.CurrentImage()));
                        image.updateImage = false;
+                       g.animate = false;
+                       g.updated = false;
+                       return;
                    }
 
                    if (g.animate)
@@ -187,11 +190,15 @@ namespace Engine
                 TransformGroup transformGroup = (TransformGroup)img.RenderTransform;
                 transformGroup.Children.Add(new RotateTransform());
                 ((RotateTransform)transformGroup.Children[0]).Angle = 90; //Rotation is different way around
-                transformGroup.Children.Add(new TranslateTransform());
+                TranslateTransform translate = new TranslateTransform
+                {
+                    X = g.position.X * GameWorld.fieldSize,
+                    Y = g.position.Y * GameWorld.fieldSize
+                };
+                transformGroup.Children.Add(translate);
                 img.RenderTransform = transformGroup;
 
                 canvas.Children.Add(img);
-                SetPosition(g.id);
                 images.Add(img);
                 return;
             }
@@ -261,8 +268,7 @@ namespace Engine
                     {
                         if (r.Name == "f" + g.id.ToString())
                         {
-                            Canvas.SetTop(r, g.position.Y);
-                            Canvas.SetLeft(r, g.position.X);
+                            SetPosition(g, r);
                             return;
                         }
                     });
@@ -290,8 +296,8 @@ namespace Engine
                     {
                         if (r.Name == "f" + g.id.ToString())
                         {
-                            Canvas.SetTop(r, g.position.Y);
-                            Canvas.SetLeft(r, g.position.X);
+                            Canvas.SetTop(r, g.position.Y * GameWorld.fieldSize);
+                            Canvas.SetLeft(r, g.position.X * GameWorld.fieldSize);
                             return;
                         }
                     });

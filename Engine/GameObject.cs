@@ -56,6 +56,8 @@ namespace Engine
         }
     }
 
+    public enum RoomType { Air, Wall, Boulder };
+
     public class MapObject : GameObject
     {
         public bool mineable;
@@ -63,6 +65,25 @@ namespace Engine
         public MapObject(int ID, Color Color, Point Position, bool blocking = false, bool Mineable = false) : base(ID, Color, Position, blocking)
         {
             mineable = Mineable;
+        }
+
+        public static MapObject CreateRoomType(int ID, Point position, RoomType type)
+        {
+            switch (type)
+            {
+                case RoomType.Air:
+
+                    return new Space(ID, position);
+
+                case RoomType.Wall:
+                    return new Wall(ID, position);
+
+                case RoomType.Boulder:
+                    return new Boulder(ID, position);
+
+                default:
+                    throw new Exception("Unknown type!");
+            }
         }
     }
 
