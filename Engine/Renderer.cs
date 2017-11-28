@@ -1,322 +1,225 @@
-﻿using Engine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Controls;
-using System.Windows.Shapes;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.Animation;
 
-namespace Engine
+namespace Engine.Rendering
 {
     public class Renderer
     {
-        private Canvas canvas;
+        public int RunningAnimations = 0;
 
-        private List<GameObject> gameObjects = new List<GameObject>();
-        private List<Shape> shapes = new List<Shape>();
-        private List<Image> images = new List<Image>();
+        internal static int FieldSize = GameWorld.fieldSize;
+        private static Dimension FieldDimension = new Dimension(FieldSize, FieldSize);
+
+        private System.Windows.Controls.Canvas canvas;
+
+        private List<RenderObject> renderObjects = new List<RenderObject>();
 
         private GameController gameController;
 
-        public Renderer(GameController game, Canvas Canvas, List<GameObject> GameObjects)
+        //This is assumed to be in fields not in pixels
+        private Dimension map;
+
+        private Dimension screen;
+        internal Point center;
+
+        public Renderer(System.Windows.Controls.Canvas Canvas, GameController controller, Point Center, List<GameObject> gameObjects)
         {
-            gameController = game;
-            gameObjects = GameObjects;
-            gameObjects.ForEach(g => shapes.Add(
-                new Rectangle()
-                {
-                    Name = "f" + g.id.ToString(),
-                    Width = GameWorld.fieldSize,
-                    Height = GameWorld.fieldSize,
-                    Fill = new SolidColorBrush(g.color),
-                    Stroke = new SolidColorBrush(g.color)
-                }));
+            //TODO: Allow game objects added this way to be images or any type other than just rectangle
+
+            #region Parameter checking
+
+            if (Canvas.Width % FieldSize != 0 || Canvas.Height % FieldSize != 0) throw new Exception("The canvas size is not a multiple of a game object size");
+
+            #endregion Parameter checking
+
+            #region Variable Declaration
 
             canvas = Canvas;
-            shapes.ForEach(s =>
-            {
-                canvas.Children.Add(s);
-                int id = int.Parse(s.Name.Remove(0, 1));
-                SetPosition(id);
-            });
+            gameController = controller;
+
+            map = new Dimension(gameController.gameWorld.map.GetUpperBound(0), gameController.gameWorld.map.GetUpperBound(1));
+            screen = new Dimension((int)canvas.Width / FieldSize, (int)canvas.Height / FieldSize);
+            center = Center;
+
+            #endregion Variable Declaration
+
+            #region Add GameObjects
+
+            gameObjects.ForEach(g => renderObjects.Add(new RenderObject(g, null, RenderObjectType.rectangle, FieldDimension, canvas, this)));
+
+            #endregion Add GameObjects
         }
 
-        protected static ImageSource BitmapToImageSource(System.Drawing.Bitmap image)
+        internal static System.Windows.Media.ImageSource BitmapToImageSource(System.Drawing.Bitmap image)
         {
             return System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(image.GetHbitmap(),
-                IntPtr.Zero, System.Windows.Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                IntPtr.Zero, System.Windows.Int32Rect.Empty, System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
         }
 
-        private int runningAnimations = 0;
-
-        private void StartAnimation()
+        public void AddEntity(GameObject gameObject, RenderObjectType type)
         {
-            if (runningAnimations == 0) gameController.inAnimation = true;
-            runningAnimations++;
+            renderObjects.Add(new RenderObject(gameObject, null, type, gameObject.size, canvas, this));
         }
 
-        private void EndAnimation(object sender, EventArgs e)
+        public void RemoveEntity(GameObject gameObject)
         {
-            runningAnimations--;
-            if (runningAnimations == 0) gameController.inAnimation = false;
-        }
-
-        private void AnimatePositionChange(GameObject g)
-
-        {
-            List<Shape> list = shapes.Where(S => S.Name == "f" + g.id.ToString()).ToList();
-            if (list.Count != 0)
-            {
-                StartAnimation();
-                StartAnimation();
-                Shape img = shapes[0];
-                Vector offset = VisualTreeHelper.GetOffset(img);
-                var left = offset.X + img.RenderTransform.Value.OffsetX;
-                var top = offset.Y + img.RenderTransform.Value.OffsetY;
-                TranslateTransform trans = new TranslateTransform();
-                img.RenderTransform = trans;
-                DoubleAnimation anim1 = new DoubleAnimation(top, g.position.Y * GameWorld.fieldSize, TimeSpan.FromSeconds(1));
-                DoubleAnimation anim2 = new DoubleAnimation(left, g.position.X * GameWorld.fieldSize, TimeSpan.FromSeconds(1));
-                anim1.Completed += EndAnimation;
-                anim2.Completed += EndAnimation;
-                trans.BeginAnimation(TranslateTransform.YProperty, anim1);
-                trans.BeginAnimation(TranslateTransform.XProperty, anim2);
-                return;
-            }
-            List<Image> image = images.Where(i => i.Name == "f" + g.id.ToString()).ToList();
-            if (image.Count != 0)
-            {
-                StartAnimation();
-                StartAnimation();
-                Image img = image[0];
-                Vector offset = VisualTreeHelper.GetOffset(img);
-                var left = offset.X + img.RenderTransform.Value.OffsetX;
-                var top = offset.Y + img.RenderTransform.Value.OffsetY;
-                TranslateTransform trans = ((TransformGroup)img.RenderTransform).Children[1] as TranslateTransform;
-                DoubleAnimation anim1 = new DoubleAnimation(top, g.position.Y * GameWorld.fieldSize, TimeSpan.FromSeconds(1));
-                DoubleAnimation anim2 = new DoubleAnimation(left, g.position.X * GameWorld.fieldSize, TimeSpan.FromSeconds(1));
-                anim1.Completed += EndAnimation;
-                anim2.Completed += EndAnimation;
-                trans.BeginAnimation(TranslateTransform.YProperty, anim1);
-                trans.BeginAnimation(TranslateTransform.XProperty, anim2);
-                return;
-            }
+            renderObjects.Where(r => r.ID == gameObject.id).ToList().ForEach(g => g.Delete());
+            renderObjects.RemoveAll(r => r.ID == gameObject.id);
         }
 
         public void Update()
         {
-            gameObjects.ForEach(g =>
-           {
-               if (g.updated)
-               {
-                   if (g is ImageEntity image && image.updateImage)
-                   {
-                       //Find image
-                       images.First(i => i.Name == "f" + image.id).Source =
-                        BitmapToImageSource(new System.Drawing.Bitmap(image.CurrentImage()));
-                       image.updateImage = false;
-                       g.animate = false;
-                       g.updated = false;
-                       return;
-                   }
-
-                   if (g.animate)
-                   {
-                       if (g.animationType == AnimationType.movement) AnimatePositionChange(g);
-                       if (g.animationType == AnimationType.rotation) AnimateRotationChange(g);
-                   }
-                   else
-                   {
-                       SetAbsolutePosition(g.id, g.position);
-                   }
-                   g.animate = false;
-                   g.updated = false;
-               }
-           });
+            renderObjects.ForEach(r => r.Update());
         }
 
-        private void AnimateRotationChange(GameObject g)
+        public void EndAnimation(object sender, EventArgs e)
         {
-            List<Shape> list = shapes.Where(S => S.Name == "f" + g.id.ToString()).ToList();
-            if (list.Count != 0)
-            {
-                throw new System.NotImplementedException();
-            }
-            List<Image> image = images.Where(i => i.Name == "f" + g.id.ToString()).ToList();
-            if (image.Count != 0)
-            {
-                StartAnimation();
-                Image img = image[0];
-                //Angles are to left = negative Top is 0
-                //000 090 180 270 -> Gameobject
-                //090 000 270 180 -> Control
-                //
-                //000 001 002 003
-                //090 -90 090 -90
-                //Therefor if even +90 else -90
-                //TODO: ACTUAL SOLVE THE PROBLEM
-
-                int angle = 0;
-                if ((g.Angle / 90) % 2 == 0) angle = 90;
-                else angle = -90;
-
-                DoubleAnimation anim1 = new DoubleAnimation(g.Angle + angle, TimeSpan.FromSeconds(1));
-                anim1.Completed += EndAnimation;
-                ((RotateTransform)((TransformGroup)img.RenderTransform).Children[0]).
-                    BeginAnimation(RotateTransform.AngleProperty, anim1);
-                return;
-            }
+            RunningAnimations--;
         }
+    }
 
-        public void AddEntity(GameObject g, bool isImage = false)
+    public enum RenderObjectType
+    { rectangle, image };
+
+    internal class RenderObject
+    {
+        private Renderer renderer;
+
+        private GameObject gameObject;
+        private System.Windows.UIElement uIElement;
+        private RenderObjectType type;
+        private Dimension size;
+
+        private System.Windows.Media.TranslateTransform translateTransform;
+        private System.Windows.Media.RotateTransform rotateTransform;
+
+        private System.Windows.Controls.Canvas canvas;
+
+        public int ID { get { return gameObject.id; } }
+
+        public RenderObject(GameObject GameObject, System.Windows.UIElement element, RenderObjectType objectType, Dimension Size, System.Windows.Controls.Canvas Canvas, Renderer controller)
         {
-            gameObjects.Add(g);
-            if (isImage)
+            //Create new UI Element
+            if (element is null)
             {
-                Image img = new Image
+                switch (objectType)
                 {
-                    Name = "f" + g.id.ToString(),
-                    Width = GameWorld.fieldSize,
-                    Height = GameWorld.fieldSize,
-                    Source = BitmapToImageSource(new System.Drawing.Bitmap(((ImageEntity)g).CurrentImage())),
-                    RenderTransform = new TransformGroup(),
-                    RenderTransformOrigin = new Point(0.5, 0.5)
-                };
-                TransformGroup transformGroup = (TransformGroup)img.RenderTransform;
-                transformGroup.Children.Add(new RotateTransform());
-                ((RotateTransform)transformGroup.Children[0]).Angle = 90; //Rotation is different way around
-                TranslateTransform translate = new TranslateTransform
-                {
-                    X = g.position.X * GameWorld.fieldSize,
-                    Y = g.position.Y * GameWorld.fieldSize
-                };
-                transformGroup.Children.Add(translate);
-                img.RenderTransform = transformGroup;
-
-                canvas.Children.Add(img);
-                images.Add(img);
-                return;
-            }
-            Rectangle s = new Rectangle()
-            {
-                Name = "f" + g.id.ToString(),
-                Width = GameWorld.fieldSize,
-                Height = GameWorld.fieldSize,
-                Fill = new SolidColorBrush(g.color),
-                Stroke = new SolidColorBrush(g.color)
-            };
-            canvas.Children.Add(s);
-            SetPosition(int.Parse(s.Name.Remove(0, 1)));
-            shapes.Add(s);
-        }
-
-        public void RemoveEntity(GameObject g)
-        {
-            List<Shape> _Shape = new List<Shape>(shapes);
-            foreach (Shape s in shapes)
-            {
-                if (s.Name == "f" + g.id.ToString())
-                {
-                    _Shape.Remove(s);
-                    canvas.Children.Remove(s);
-                }
-            };
-            shapes = _Shape;
-            images.ForEach(i =>
-            {
-                if (i.Name == "f" + g.id.ToString())
-                {
-                    images.Remove(i);
-                    canvas.Children.Remove(i);
-                }
-            });
-
-            gameObjects.Remove(g);
-        }
-
-        public bool LoadScene()
-        {
-            return true;
-        }
-
-        private void SetPosition(GameObject g, Shape s)
-        {
-            Canvas.SetTop(s, g.position.Y * GameWorld.fieldSize);
-            Canvas.SetLeft(s, g.position.X * GameWorld.fieldSize);
-        }
-
-        private void SetPosition(GameObject g, Image s)
-        {
-            Canvas.SetTop(s, g.position.Y * GameWorld.fieldSize);
-            Canvas.SetLeft(s, g.position.X * GameWorld.fieldSize);
-        }
-
-        private void SetPosition(int Id, Point offset)
-        {
-            Vector vector = new Vector(offset.X, offset.Y);
-            gameObjects.ForEach(g =>
-            {
-                if (Id == g.id)
-                {
-                    g.position += vector;
-                    shapes.ForEach(r =>
-                    {
-                        if (r.Name == "f" + g.id.ToString())
+                    case RenderObjectType.rectangle:
+                        element = new System.Windows.Shapes.Rectangle()
                         {
-                            SetPosition(g, r);
-                            return;
-                        }
-                    });
-                    images.ForEach(i =>
-                   {
-                       if (i.Name == "f" + g.id.ToString())
-                       {
-                           SetPosition(g, i);
-                           return;
-                       }
-                   });
-                    return;
-                }
-            });
-        }
+                            Width = Size.Width,
+                            Height = Size.Height,
+                            Fill = new System.Windows.Media.SolidColorBrush(GameObject.color),
+                            Stroke = new System.Windows.Media.SolidColorBrush(GameObject.color),
+                            RenderTransform = new System.Windows.Media.TransformGroup(),
+                            RenderTransformOrigin = new System.Windows.Point(0.5, 0.5)
+                        };
+                        System.Windows.Media.TransformGroup transformGroup = (System.Windows.Media.TransformGroup)element.RenderTransform;
+                        rotateTransform = new System.Windows.Media.RotateTransform(90); //Rotation is different system than used
+                        transformGroup.Children.Add(rotateTransform);
+                        translateTransform = new System.Windows.Media.TranslateTransform(GameObject.position.x * Renderer.FieldSize, GameObject.position.y * Renderer.FieldSize);
+                        transformGroup.Children.Add(translateTransform);
+                        element.RenderTransform = transformGroup;
+                        break;
 
-        private void SetAbsolutePosition(int Id, Point position)
-        {
-            gameObjects.ForEach(g =>
-            {
-                if (Id == g.id)
-                {
-                    g.position = position;
-                    shapes.ForEach(r =>
-                    {
-                        if (r.Name == "f" + g.id.ToString())
+                    case RenderObjectType.image:
+                        element = new System.Windows.Controls.Image()
                         {
-                            Canvas.SetTop(r, g.position.Y * GameWorld.fieldSize);
-                            Canvas.SetLeft(r, g.position.X * GameWorld.fieldSize);
-                            return;
-                        }
-                    });
-                    images.ForEach(i =>
-                   {
-                       if (i.Name == "f" + g.id.ToString())
-                       {
-                           SetPosition(g, i);
-                           return;
-                       }
-                   });
-                    return;
+                            Width = Size.Width * Renderer.FieldSize, //TODO: Fix the difference in size between the two types
+                            Height = Size.Height * Renderer.FieldSize,
+                            Source = Renderer.BitmapToImageSource(new System.Drawing.Bitmap(((ImageEntity)GameObject).CurrentImage())),
+                            RenderTransform = new System.Windows.Media.TransformGroup(),
+                            RenderTransformOrigin = new System.Windows.Point(0.5, 0.5)
+                        };
+                        transformGroup = (System.Windows.Media.TransformGroup)element.RenderTransform;
+                        rotateTransform = new System.Windows.Media.RotateTransform(90); //Rotation is different system than used
+                        transformGroup.Children.Add(rotateTransform);
+                        translateTransform = new System.Windows.Media.TranslateTransform(GameObject.position.x * Renderer.FieldSize, GameObject.position.y * Renderer.FieldSize);
+                        transformGroup.Children.Add(translateTransform);
+                        element.RenderTransform = transformGroup;
+                        break;
+
+                    default:
+                        break;
                 }
-            });
+            }
+
+            gameObject = GameObject;
+            uIElement = element;
+            type = objectType;
+            size = Size;
+            renderer = controller;
+            canvas = Canvas;
+
+            Canvas.Children.Add(uIElement);
         }
 
-        private void SetPosition(int Id, int xOffset = 0, int yOffset = 0)
+        public void Delete()
         {
-            SetPosition(Id, new Point(xOffset, yOffset));
+            canvas.Children.Remove(uIElement);
+        }
+
+        private void UpdatePosition(bool animated = true)
+        {
+            if (animated)
+            {
+                renderer.RunningAnimations++;
+                renderer.RunningAnimations++;
+
+                System.Windows.Media.Animation.DoubleAnimation animX = new System.Windows.Media.Animation.DoubleAnimation(gameObject.position.x + renderer.center.x, TimeSpan.FromSeconds(1));
+                System.Windows.Media.Animation.DoubleAnimation animY = new System.Windows.Media.Animation.DoubleAnimation(gameObject.position.y + renderer.center.y, TimeSpan.FromSeconds(1));
+                animX.Completed += renderer.EndAnimation;
+                animY.Completed += renderer.EndAnimation;
+                translateTransform.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty, animX);
+                translateTransform.BeginAnimation(System.Windows.Media.TranslateTransform.YProperty, animX);
+            }
+            else
+            {
+                translateTransform.X = gameObject.position.x + renderer.center.x;
+                translateTransform.Y = gameObject.position.y + renderer.center.y;
+            }
+        }
+
+        private void UpdateRotation(bool animated = true)
+        {
+            renderer.RunningAnimations++;
+
+            //Angles are to left = negative Top is 0
+            //000 090 180 270 -> Gameobject
+            //090 000 270 180 -> Control
+            //
+            //000 001 002 003
+            //090 -90 090 -90
+            //Therefor if even +90 else -90
+            //TODO: ACTUAL SOLVE THE PROBLEM
+
+            int angle = 0;
+            if ((gameObject.Angle / 90) % 2 == 0) angle = 90;
+            else angle = -90;
+
+            System.Windows.Media.Animation.DoubleAnimation animRot = new System.Windows.Media.Animation.DoubleAnimation(gameObject.Angle + angle, TimeSpan.FromSeconds(1));
+            animRot.Completed += renderer.EndAnimation;
+            rotateTransform.BeginAnimation(System.Windows.Media.RotateTransform.AngleProperty, animRot);
+        }
+
+        public void Update()
+        {
+            if (gameObject.updated)
+            {
+                ImageEntity imageObject = ((ImageEntity)gameObject);
+                if (type == RenderObjectType.image && imageObject.updateImage)
+                    ((System.Windows.Controls.Image)uIElement).Source = Renderer.BitmapToImageSource(new System.Drawing.Bitmap(imageObject.CurrentImage()));
+
+                if (gameObject.animate)
+                {
+                    if (gameObject.animationType == AnimationType.movement) UpdatePosition();
+                    else if (gameObject.animationType == AnimationType.rotation) UpdatePosition();
+                }
+                gameObject.updated = false;
+            }
         }
     }
 }

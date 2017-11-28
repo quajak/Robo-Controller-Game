@@ -9,10 +9,6 @@ namespace Engine
 {
     internal static class Utility
     {
-        public static Point AddPoint(Point A, Point B)
-        {
-            return A + new Vector(B.X, B.Y);
-        }
     }
 
     public struct Adjacent<T>
@@ -30,6 +26,59 @@ namespace Engine
             right = Right;
             bottom = Bottom;
             raw = new T[] { Top, Left, Right, Bottom };
+        }
+    }
+
+    public class Point
+    {
+        public int x;
+        public int y;
+
+        public Point(int X, int Y)
+        {
+            x = X;
+            y = Y;
+        }
+
+        public static Point operator +(Point A, Point B)
+        {
+            Point C = new Point(A.x, A.y);
+            C.x += B.x;
+            C.y += B.y;
+            return C;
+        }
+
+        public static Point operator -(Point A, Point B)
+        {
+            Point C = new Point(A.x, A.y);
+            C.x -= B.x;
+            C.y -= B.y;
+            return C;
+        }
+
+        public static Point operator *(Point A, int B)
+        {
+            Point C = new Point(A.x, A.y);
+            C.x *= B;
+            C.y *= B;
+            return C;
+        }
+
+        public System.Windows.Point NatrualPoint()
+        {
+            return new System.Windows.Point(x, y);
+        }
+    }
+
+    public class Dimension
+    {
+        public int Width;
+        public int Height;
+
+        public Dimension(int width, int height)
+        {
+            Width = width;
+            Height = height;
         }
     }
 }

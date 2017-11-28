@@ -15,7 +15,7 @@ namespace Engine
     {
         public GameWorld gameWorld;
         public Robot robot;
-        public Renderer renderer;
+        public Rendering.Renderer renderer;
         private int entityCounter = 0;
         private Programm runningProgramm;
 
@@ -41,7 +41,7 @@ namespace Engine
             Point robotStartPosition = new Point(1, 1);
             runningProgramm = new Programm(this);
             gameWorld = new GameWorld(width, height, robotStartPosition);
-            renderer = new Renderer(this, GameBoard, gameWorld.map.Cast<GameObject>().ToList());
+            renderer = new Rendering.Renderer(GameBoard, this, robotStartPosition, gameWorld.map.Cast<GameObject>().ToList());
 
             commandTimer = new DispatcherTimer
             {
@@ -61,7 +61,7 @@ namespace Engine
             //Calculate robot values
             robot.equipment.ForEach(e => e.SettupRobot());
 
-            renderer.AddEntity(robot, isImage: true);
+            renderer.AddEntity(robot, Rendering.RenderObjectType.image);
             SettupRobotInfo();
         }
 

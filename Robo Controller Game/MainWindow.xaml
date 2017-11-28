@@ -27,7 +27,7 @@
                 </Grid>
             </ScrollViewer>
         </Grid>
-        <Canvas x:Name="GameBoard" HorizontalAlignment="Left" Height="269" VerticalAlignment="Top" Width="346" Initialized="GameBoard_Initialized" MaxWidth="345" MaxHeight="313" ClipToBounds="True" Canvas.Left="932" Background="{DynamicResource GridBackground}" Canvas.Top="10" />
+        <Canvas x:Name="GameBoard" HorizontalAlignment="Left" Height="260" VerticalAlignment="Top" Width="340" Initialized="GameBoard_Initialized" MaxWidth="345" MaxHeight="313" ClipToBounds="True" Canvas.Left="932" Background="{DynamicResource GridBackground}" Canvas.Top="10" />
         <Grid x:Name="robotPartGridSecond" Height="400" Canvas.Left="346" Canvas.Top="36" Width="320" HorizontalAlignment="Left" VerticalAlignment="Top" />
         <Border BorderBrush="{DynamicResource ButtonBorder}" BorderThickness="1" Height="121" Canvas.Left="693" Canvas.Top="315" Width="585" Background="{DynamicResource ButtonBackground}">
             <Grid>

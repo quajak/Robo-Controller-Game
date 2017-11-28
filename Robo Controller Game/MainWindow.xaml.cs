@@ -41,7 +41,7 @@ namespace Robo_Controller_Game
         {
             InitializeComponent();
 
-            gameController = new GameController(40, 20, GameBoard, CPUProgressBar, this);
+            gameController = new GameController(40, 40, GameBoard, CPUProgressBar, this);
             ShowRobotEquipment();
             UpdatePlayerUI();
         }

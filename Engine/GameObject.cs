@@ -16,7 +16,7 @@ namespace Engine
         public Point position;
         public Color color;
         public readonly int id;
-        private int angle;
+        private int angle = 0;
         private int oldAngle;
 
         public bool updated = false;
@@ -27,6 +27,8 @@ namespace Engine
         public List<Entity> entities;
 
         public int health;
+
+        public Dimension size;
 
         public int Angle
         {
@@ -45,8 +47,11 @@ namespace Engine
             get { return oldAngle; }
         }
 
-        public GameObject(int Id, Color Color, Point Position, bool Blocking = false)
+        public GameObject(int Id, Color Color, Point Position, bool Blocking = false, Dimension Size = null)
         {
+            if (Size is null) Size = new Dimension(1, 1);
+
+            size = Size;
             blocking = Blocking;
             angle = 0;
             id = Id;
@@ -173,8 +178,8 @@ namespace Engine
 
             EnterField = e =>
             {
-                Vector movement = Programm.GetOffset(e.Angle, e.position, gameController.gameWorld, out MapObject field);
-                if (movement == new Vector(0, 0)) return true;
+                Point movement = Programm.GetOffset(e.Angle, e.position, gameController.gameWorld, out MapObject field);
+                if (movement == new Point(0, 0)) return true;
                 if (!field.blocking && field.entities.TrueForAll(E => !E.blocking))
                 {
                     //Change map tile owner

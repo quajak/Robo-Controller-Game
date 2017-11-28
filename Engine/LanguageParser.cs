@@ -151,15 +151,15 @@ namespace Engine
                     //Check if player is able to mine
                     if (gameController.activeEquipment.Find(e => e.type == EquipmentType.mining) != null)
                     {
-                        Vector direction = GetOffset(gameController.robot.Angle, gameController.robot.position, gameController.gameWorld, out MapObject field);
+                        Point direction = GetOffset(gameController.robot.Angle, gameController.robot.position, gameController.gameWorld, out MapObject field);
                         if (field == null) throw new Exception("Something went wrong!");
-                        if (direction == new Vector(0, 0) || !field.mineable) break;
-                        int x = (int)(field.position.X / GameWorld.fieldSize);
-                        int y = (int)(field.position.Y / GameWorld.fieldSize);
+                        if (direction == new Point(0, 0) || !field.mineable) break;
+                        int x = (int)(field.position.x / GameWorld.fieldSize);
+                        int y = (int)(field.position.y / GameWorld.fieldSize);
                         //mine field
                         gameController.renderer.RemoveEntity(gameController.gameWorld.map[x, y]);
                         gameController.gameWorld.map[x, y] = new Space(field.id, field.position) { updated = true };
-                        gameController.renderer.AddEntity(gameController.gameWorld.map[x, y]);
+                        gameController.renderer.AddEntity(gameController.gameWorld.map[x, y], Rendering.RenderObjectType.rectangle);
                     }
                     else
                     {
@@ -183,34 +183,34 @@ namespace Engine
             ExecutionIndex = 0;
         }
 
-        public static Vector GetOffset(int Angle, Point position, GameWorld gameWorld, out MapObject field)
+        public static Point GetOffset(int Angle, Point position, GameWorld gameWorld, out MapObject field)
         {
-            Vector movement;
+            Point movement;
             switch (Angle)
             {
-                case (0) when (position.X != gameWorld.map.GetUpperBound(0)):
-                    field = gameWorld.map[(int)position.X + 1, (int)position.Y];
-                    movement = new Vector(1, 0);
+                case (0) when (position.x != gameWorld.map.GetUpperBound(0)):
+                    field = gameWorld.map[position.x + 1, position.y];
+                    movement = new Point(1, 0);
                     break;
 
-                case (90) when (position.Y != 0):
-                    field = gameWorld.map[(int)position.X, (int)position.Y - 1];
-                    movement = new Vector(0, -1);
+                case (90) when (position.y != 0):
+                    field = gameWorld.map[position.x, position.y - 1];
+                    movement = new Point(0, -1);
                     break;
 
-                case (180) when (position.X != 0):
-                    field = gameWorld.map[(int)position.X - 1, (int)position.Y];
-                    movement = new Vector(-1, 0);
+                case (180) when (position.x != 0):
+                    field = gameWorld.map[position.x - 1, position.y];
+                    movement = new Point(-1, 0);
                     break;
 
-                case (270) when (position.Y != gameWorld.map.GetUpperBound(1)):
-                    field = gameWorld.map[(int)position.X, (int)position.Y + 1];
-                    movement = new Vector(0, 1);
+                case (270) when (position.y != gameWorld.map.GetUpperBound(1)):
+                    field = gameWorld.map[position.x, position.y + 1];
+                    movement = new Point(0, 1);
                     break;
 
                 case int value:
-                    field = gameWorld.map[(int)position.X, (int)position.Y];
-                    movement = new Vector(0, 0);
+                    field = gameWorld.map[position.x, position.y];
+                    movement = new Point(0, 0);
                     break;
 
                 default:

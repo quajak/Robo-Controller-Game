@@ -170,8 +170,8 @@ namespace Engine
             public Line(Point Start, Point End, RoomType Type)
             {
                 //TODO: Allow lines to change in both x and y values
-                if (Start.X != End.X && Start.Y != End.Y) throw new NotImplementedException();
-                if (Start.X > End.X || Start.Y > End.Y) throw new Exception("The dimensions of the line are wrong!");
+                if (Start.x != End.x && Start.y != End.y) throw new NotImplementedException();
+                if (Start.x > End.x || Start.y > End.y) throw new Exception("The dimensions of the line are wrong!");
                 start = Start;
                 end = End;
                 type = Type;
@@ -184,22 +184,22 @@ namespace Engine
 
             public override void Generate(MapObject[,] map, Point Offset, ref int IDCounter)
             {
-                if (start.X == end.X)
+                if (start.x == end.x)
                 {
                     //Change in y value
-                    for (int i = 0; i <= end.Y - start.Y; i++)
+                    for (int i = 0; i <= end.y - start.y; i++)
                     {
-                        map[(int)start.X + (int)Offset.X, (int)start.Y + i + (int)Offset.Y] = MapObject.CreateRoomType(IDCounter++,
-                            Utility.AddPoint(Offset, start) + new Vector(0, i), type);
+                        map[start.x + Offset.x, start.y + i + Offset.y] = MapObject.CreateRoomType(IDCounter++,
+                            Offset + start + new Point(0, i), type);
                     }
                 }
                 else
                 {
                     //Change in x value
-                    for (int i = 0; i <= end.X - start.X; i++)
+                    for (int i = 0; i <= end.x - start.x; i++)
                     {
-                        map[(int)start.X + i + (int)Offset.X, (int)start.Y + (int)Offset.Y] = MapObject.CreateRoomType(IDCounter++,
-                            Utility.AddPoint(Offset, start) + new Vector(i, 0), type);
+                        map[start.x + i + Offset.x, start.y + Offset.y] = MapObject.CreateRoomType(IDCounter++,
+                            Offset + start + new Point(i, 0), type);
                     }
                 }
             }
@@ -222,7 +222,7 @@ namespace Engine
 
             public override void Generate(MapObject[,] map, Point Offset, ref int IDCounter)
             {
-                map[(int)position.X + (int)Offset.X, (int)position.Y + (int)Offset.Y] = MapObject.CreateRoomType(IDCounter++, position, type);
+                map[position.x + Offset.x, position.y + Offset.y] = MapObject.CreateRoomType(IDCounter++, position, type);
             }
         }
 
