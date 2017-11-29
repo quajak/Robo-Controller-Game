@@ -46,6 +46,12 @@ namespace Robo_Controller_Game
             UpdatePlayerUI();
         }
 
+        private void GameBoard_Initialized(object sender, EventArgs e)
+        {
+        }
+
+        #region Shop
+
         private void ShowRobotEquipment()
         {
             ClearSecondView();
@@ -175,9 +181,9 @@ namespace Robo_Controller_Game
             robotPartGridSecond.ColumnDefinitions.Clear();
         }
 
-        private void GameBoard_Initialized(object sender, EventArgs e)
-        {
-        }
+        #endregion Shop
+
+        #region Code + GamePlay
 
         //RUN CODE BUtton
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -214,5 +220,7 @@ namespace Robo_Controller_Game
             if (chosen.upgrade == null) MessageBox.Show("There is no upgradeable version!");
             else ShowUpgrade(chosen.upgrade);
         }
+
+        #endregion Code + GamePlay
     }
 }

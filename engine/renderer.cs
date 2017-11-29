@@ -23,9 +23,9 @@ namespace Engine.Rendering
         private Dimension map;
 
         private Dimension screen;
-        internal Point center;
+        internal Point offset;
 
-        public Renderer(System.Windows.Controls.Canvas Canvas, GameController controller, Point Center, List<GameObject> gameObjects)
+        public Renderer(System.Windows.Controls.Canvas Canvas, GameController controller, Point Offset, List<GameObject> gameObjects)
         {
             //TODO: Allow game objects added this way to be images or any type other than just rectangle
 
@@ -42,7 +42,7 @@ namespace Engine.Rendering
 
             map = new Dimension(gameController.gameWorld.map.GetUpperBound(0), gameController.gameWorld.map.GetUpperBound(1));
             screen = new Dimension((int)canvas.Width / FieldSize, (int)canvas.Height / FieldSize);
-            center = Center;
+            offset = Offset;
 
             #endregion Variable Declaration
 
@@ -169,17 +169,19 @@ namespace Engine.Rendering
                 renderer.RunningAnimations++;
                 renderer.RunningAnimations++;
 
-                System.Windows.Media.Animation.DoubleAnimation animX = new System.Windows.Media.Animation.DoubleAnimation(gameObject.position.x + renderer.center.x, TimeSpan.FromSeconds(1));
-                System.Windows.Media.Animation.DoubleAnimation animY = new System.Windows.Media.Animation.DoubleAnimation(gameObject.position.y + renderer.center.y, TimeSpan.FromSeconds(1));
+                System.Windows.Media.Animation.DoubleAnimation animX = new System.Windows.Media.Animation.DoubleAnimation(
+                    gameObject.position.x * Renderer.FieldSize + renderer.offset.x, TimeSpan.FromSeconds(1));
+                System.Windows.Media.Animation.DoubleAnimation animY = new System.Windows.Media.Animation.DoubleAnimation(
+                    gameObject.position.y * Renderer.FieldSize + renderer.offset.y, TimeSpan.FromSeconds(1));
                 animX.Completed += renderer.EndAnimation;
                 animY.Completed += renderer.EndAnimation;
                 translateTransform.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty, animX);
-                translateTransform.BeginAnimation(System.Windows.Media.TranslateTransform.YProperty, animX);
+                translateTransform.BeginAnimation(System.Windows.Media.TranslateTransform.YProperty, animY);
             }
             else
             {
-                translateTransform.X = gameObject.position.x + renderer.center.x;
-                translateTransform.Y = gameObject.position.y + renderer.center.y;
+                translateTransform.X = gameObject.position.x + renderer.offset.x;
+                translateTransform.Y = gameObject.position.y + renderer.offset.y;
             }
         }
 
@@ -216,7 +218,7 @@ namespace Engine.Rendering
                 if (gameObject.animate)
                 {
                     if (gameObject.animationType == AnimationType.movement) UpdatePosition();
-                    else if (gameObject.animationType == AnimationType.rotation) UpdatePosition();
+                    else if (gameObject.animationType == AnimationType.rotation) UpdateRotation();
                 }
                 gameObject.updated = false;
             }
