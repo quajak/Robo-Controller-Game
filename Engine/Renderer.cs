@@ -25,8 +25,11 @@ namespace Engine.Rendering
         private Dimension screen;
         internal Point offset;
 
-        public Renderer(System.Windows.Controls.Canvas Canvas, GameController controller, Point Offset, List<GameObject> gameObjects)
+        private Robot robot;
+
+        public Renderer(System.Windows.Controls.Canvas Canvas, GameController controller, List<GameObject> gameObjects)
         {
+            //TODO: ALlow canvas to not be centered around robot!
             //TODO: Allow game objects added this way to be images or any type other than just rectangle
 
             #region Parameter checking
@@ -39,10 +42,11 @@ namespace Engine.Rendering
 
             canvas = Canvas;
             gameController = controller;
+            robot = gameController.robot;
 
             map = new Dimension(gameController.gameWorld.map.GetUpperBound(0), gameController.gameWorld.map.GetUpperBound(1));
             screen = new Dimension((int)canvas.Width / FieldSize, (int)canvas.Height / FieldSize);
-            offset = Offset;
+            offset = robot.position;
 
             #endregion Variable Declaration
 
@@ -51,6 +55,8 @@ namespace Engine.Rendering
             gameObjects.ForEach(g => renderObjects.Add(new RenderObject(g, null, RenderObjectType.rectangle, FieldDimension, canvas, this)));
 
             #endregion Add GameObjects
+
+            Update();
         }
 
         internal static System.Windows.Media.ImageSource BitmapToImageSource(System.Drawing.Bitmap image)
@@ -61,7 +67,10 @@ namespace Engine.Rendering
 
         public void AddEntity(GameObject gameObject, RenderObjectType type)
         {
-            renderObjects.Add(new RenderObject(gameObject, null, type, gameObject.size, canvas, this));
+            RenderObject item = new RenderObject(gameObject, null, type, gameObject.size, canvas, this);
+            renderObjects.Add(item);
+            //Set the correct offset
+            item.Update(forced: true);
         }
 
         public void RemoveEntity(GameObject gameObject)
@@ -72,12 +81,26 @@ namespace Engine.Rendering
 
         public void Update()
         {
-            renderObjects.ForEach(r => r.Update());
+            //Robot should be on middle tile
+            Point expectedOffset = new Point(0, 0);
+            int robotWidth = robot.size.Width * FieldSize / 2;
+            int robotHeight = robot.size.Height * FieldSize / 2;
+
+            expectedOffset.x = screen.Width * FieldSize / 2 - robotWidth - robot.position.x * FieldSize;
+            expectedOffset.y = screen.Height * FieldSize / 2 - robotHeight - robot.position.y * FieldSize;
+
+            if (!robot.animate && offset != expectedOffset)
+            {
+                offset = expectedOffset;
+                renderObjects.ForEach(r => { r.gameObject.animate = true; r.Update(forced: true); });
+            }
+            else renderObjects.ForEach(r => r.Update());
         }
 
         public void EndAnimation(object sender, EventArgs e)
         {
             RunningAnimations--;
+            if (RunningAnimations == 0) Update();
         }
     }
 
@@ -88,7 +111,7 @@ namespace Engine.Rendering
     {
         private Renderer renderer;
 
-        private GameObject gameObject;
+        internal GameObject gameObject;
         private System.Windows.UIElement uIElement;
         private RenderObjectType type;
         private Dimension size;
@@ -180,8 +203,8 @@ namespace Engine.Rendering
             }
             else
             {
-                translateTransform.X = gameObject.position.x + renderer.offset.x;
-                translateTransform.Y = gameObject.position.y + renderer.offset.y;
+                translateTransform.X = gameObject.position.x * Renderer.FieldSize + renderer.offset.x;
+                translateTransform.Y = gameObject.position.y * Renderer.FieldSize + renderer.offset.y;
             }
         }
 
@@ -207,19 +230,30 @@ namespace Engine.Rendering
             rotateTransform.BeginAnimation(System.Windows.Media.RotateTransform.AngleProperty, animRot);
         }
 
-        public void Update()
+        public void Update(bool forced = false)
         {
-            if (gameObject.updated)
+            if (gameObject.updated || forced)
             {
-                ImageEntity imageObject = ((ImageEntity)gameObject);
-                if (type == RenderObjectType.image && imageObject.updateImage)
-                    ((System.Windows.Controls.Image)uIElement).Source = Renderer.BitmapToImageSource(new System.Drawing.Bitmap(imageObject.CurrentImage()));
+                if (gameObject is ImageEntity imageObject)
+                {
+                    if (imageObject.updateImage)
+                    {
+                        ((System.Windows.Controls.Image)uIElement).Source = Renderer.BitmapToImageSource(new System.Drawing.Bitmap(imageObject.CurrentImage()));
+                        imageObject.updateImage = false;
+                    }
+                }
 
                 if (gameObject.animate)
                 {
                     if (gameObject.animationType == AnimationType.movement) UpdatePosition();
                     else if (gameObject.animationType == AnimationType.rotation) UpdateRotation();
+                    gameObject.animate = false;
                 }
+                else
+                {
+                    UpdatePosition(animated: false);
+                }
+
                 gameObject.updated = false;
             }
         }

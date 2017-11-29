@@ -64,6 +64,16 @@ namespace Engine
             return C;
         }
 
+        public static bool operator ==(Point A, Point B)
+        {
+            return A.x == B.x && A.y == B.y;
+        }
+
+        public static bool operator !=(Point A, Point B)
+        {
+            return !(A == B);
+        }
+
         public System.Windows.Point NatrualPoint()
         {
             return new System.Windows.Point(x, y);

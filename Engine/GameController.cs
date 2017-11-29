@@ -39,7 +39,6 @@ namespace Engine
             Point robotStartPosition = new Point(1, 1);
             runningProgramm = new Programm(this);
             gameWorld = new GameWorld(width, height, robotStartPosition);
-            renderer = new Rendering.Renderer(GameBoard, this, new Point(0, 0), gameWorld.map.Cast<GameObject>().ToList());
 
             commandTimer = new DispatcherTimer
             {
@@ -59,6 +58,7 @@ namespace Engine
             //Calculate robot values
             robot.equipment.ForEach(e => e.SettupRobot());
 
+            renderer = new Rendering.Renderer(GameBoard, this, gameWorld.map.Cast<GameObject>().ToList());
             renderer.AddEntity(robot, Rendering.RenderObjectType.image);
             SettupRobotInfo();
         }
