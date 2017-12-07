@@ -69,7 +69,16 @@ namespace Engine.Rendering
         {
             RenderObject item = new RenderObject(gameObject, null, type, gameObject.size, canvas, this);
             renderObjects.Add(item);
+            //Calculate
+            Point pos = item.gameObject.position * FieldSize + offset;
+            bool LowerX = offset.x - screen.Width * FieldSize / 2 - item.gameObject.size.Width * FieldSize <= pos.x;
+            bool HigherX = pos.x <= offset.x + screen.Width * FieldSize / 2 + item.gameObject.size.Width * FieldSize;
+            bool LowerY = offset.y - screen.Height * FieldSize / 2 - item.gameObject.size.Height * FieldSize <= pos.y;
+            bool HigherY = pos.y <= offset.y + screen.Height * FieldSize / 2 + item.gameObject.size.Height * FieldSize;
+            item.Enabled = LowerX && HigherX && LowerY && HigherY;
+
             //Set the correct offset
+            item.gameObject.animate = true;
             item.Update(forced: true);
         }
 
@@ -81,6 +90,13 @@ namespace Engine.Rendering
 
         public void Update()
         {
+            //Position of screen
+            //                                  robot                                           screen width offset to left
+            int LowerScreenX = (robot.position.x * FieldSize + robot.size.Width * FieldSize / 2) - (screen.Width * FieldSize / 2);
+            int LowerScreenY = (robot.position.y * FieldSize + robot.size.Height * FieldSize / 2) - (screen.Height * FieldSize / 2);
+            int UpScreenX = LowerScreenX + screen.Width * FieldSize;
+            int UpScreenY = LowerScreenY + screen.Height * FieldSize;
+
             //Robot should be on middle tile
             Point expectedOffset = new Point(0, 0);
             int robotWidth = robot.size.Width * FieldSize / 2;
@@ -92,6 +108,17 @@ namespace Engine.Rendering
             if (!robot.animate && offset != expectedOffset)
             {
                 offset = expectedOffset;
+                //Check which render objects should be visible or not
+                renderObjects.ForEach(r =>
+                {
+                    Point pos = r.gameObject.position * FieldSize;
+                    bool LowerX = LowerScreenX <= pos.x;
+                    bool HigherX = pos.x <= UpScreenX;
+                    bool LowerY = LowerScreenY <= pos.y;
+                    bool HigherY = pos.y <= UpScreenY;
+                    r.Enabled = LowerX && HigherX && LowerY && HigherY;
+                });
+
                 renderObjects.ForEach(r => { r.gameObject.animate = true; r.Update(forced: true); });
             }
             else renderObjects.ForEach(r => r.Update());
@@ -120,6 +147,20 @@ namespace Engine.Rendering
         private System.Windows.Media.RotateTransform rotateTransform;
 
         private System.Windows.Controls.Canvas canvas;
+
+        private bool enabled;
+
+        public bool Enabled
+        {
+            get { return enabled; }
+            set
+            {
+                if (enabled != value) enabled = value;
+                enabled = value;
+                if (enabled) uIElement.Visibility = System.Windows.Visibility.Visible;
+                else uIElement.Visibility = System.Windows.Visibility.Hidden;
+            }
+        }
 
         public int ID { get { return gameObject.id; } }
 
@@ -187,18 +228,18 @@ namespace Engine.Rendering
 
         private void UpdatePosition(bool animated = true)
         {
-            if (animated)
+            if (animated && enabled)
             {
-                renderer.RunningAnimations++;
-                renderer.RunningAnimations++;
+                renderer.RunningAnimations += 2;
 
                 System.Windows.Media.Animation.DoubleAnimation animX = new System.Windows.Media.Animation.DoubleAnimation(
                     gameObject.position.x * Renderer.FieldSize + renderer.offset.x, TimeSpan.FromSeconds(1));
                 System.Windows.Media.Animation.DoubleAnimation animY = new System.Windows.Media.Animation.DoubleAnimation(
                     gameObject.position.y * Renderer.FieldSize + renderer.offset.y, TimeSpan.FromSeconds(1));
+
                 animX.Completed += renderer.EndAnimation;
-                animY.Completed += renderer.EndAnimation;
                 translateTransform.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty, animX);
+                animY.Completed += renderer.EndAnimation;
                 translateTransform.BeginAnimation(System.Windows.Media.TranslateTransform.YProperty, animY);
             }
             else
@@ -234,7 +275,7 @@ namespace Engine.Rendering
         {
             if (gameObject.updated || forced)
             {
-                if (gameObject is ImageEntity imageObject)
+                if (gameObject is ImageEntity imageObject && enabled)
                 {
                     if (imageObject.updateImage)
                     {
