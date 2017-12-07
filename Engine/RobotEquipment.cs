@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 
 namespace Engine
 {
+    //TODO: Create new NameSpace
     public enum EquipmentType { basic, mining, ram };
 
     public abstract class RobotEquipment
