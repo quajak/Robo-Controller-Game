@@ -222,5 +222,10 @@ namespace Robo_Controller_Game
         }
 
         #endregion Code + GamePlay
+
+        private void CancelRun_Click(object sender, RoutedEventArgs e)
+        {
+            gameController.ClearCode();
+        }
     }
 }

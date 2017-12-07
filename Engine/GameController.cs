@@ -126,5 +126,12 @@ namespace Engine
             }
             return true;
         }
+
+        public void ClearCode()
+        {
+            timeElapsed = 0;
+            CPUprogressBar.Value = 0;
+            runningProgramm.Clear();
+        }
     }
 }
