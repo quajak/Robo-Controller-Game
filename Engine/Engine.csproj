@@ -59,6 +59,7 @@
     </Compile>
     <Compile Include="RobotEquipment.cs" />
     <Compile Include="Utility.cs" />
+    <Compile Include="Variable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\Resources\BasicCasing.jpg" />

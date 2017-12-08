@@ -24,6 +24,7 @@ namespace Engine.Programming
         {
             error = "";
             List<string> parameters = command.Where((s, i) => i != 0).ToList();
+            parameters = parameters.Where(p => p != "").ToList();
             switch (command[0])
             {
                 case "mine":
@@ -42,6 +43,9 @@ namespace Engine.Programming
                 case "gt":
                 case "goto":
                     return new GOTO(parameters, _gameController, _programm, out error);
+
+                case "set":
+                    return new SetVariable(parameters, _gameController, _programm, out error);
 
                 default:
                     throw new NotImplementedException();
@@ -114,6 +118,70 @@ namespace Engine.Programming
         }
     }
 
+    internal class SetVariable : Command
+    {
+        private string _ID;
+        private string rawVariable;
+        private VariableType variableType;
+
+        public SetVariable(List<string> parameters, GameController _gameController, Programm _programm, out string error)
+            : base(_gameController, _programm)
+        {
+            error = "";
+
+            if (parameters.Count != 2)
+            {
+                error = "Syntax Error: The number of parameters is wrong!";
+                return;
+            }
+
+            _ID = parameters[0];
+            rawVariable = parameters[1];
+
+            //Find type
+            if (int.TryParse(parameters[1], out int t)) variableType = VariableType.integer;
+            else error = $"Syntax Error: The value is not correct!{parameters[1]}";
+
+            if (error == "") programm.possibleVariables.Add(parameters[0]);
+        }
+
+        public override Command Run(out string error)
+        {
+            error = "";
+            //IF variable does not exists
+            if (!programm.variables.Exists(v => v.ID == _ID))
+            {
+                //Create new variable
+                Variable toAdd = null;
+                switch (variableType)
+                {
+                    case VariableType.integer:
+                        toAdd = new Integer(int.Parse(rawVariable), _ID);
+                        break;
+
+                    default:
+                        break;
+                }
+                programm.variables.Add(toAdd);
+            }
+            else
+            {
+                Variable variable = programm.variables.First(v => v.ID == _ID);
+                switch (variable.type)
+                {
+                    case VariableType.integer:
+                        Integer integer = variable as Integer;
+                        integer.value = int.Parse(rawVariable);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            return next;
+        }
+    }
+
     internal class Rotate : Command
     {
         private int angle;
@@ -144,7 +212,9 @@ namespace Engine.Programming
 
     internal class Move : Command
     {
-        private int counter = 0, max;
+        private int counter = 0;
+        private int distance;
+        private string idName = "";
 
         public Move(List<string> parameters, GameController _gameController, Programm _programm, out string error) : base(_gameController, _programm)
         {
@@ -155,18 +225,37 @@ namespace Engine.Programming
                 error = $"Expected 1 paramter, got {parameters.Count}!";
                 return;
             }
-            if (!Int32.TryParse(parameters[0], out max))
+            if (!Int32.TryParse(parameters[0], out int dis))
             {
-                error = $"The first parameter is not a number! ({parameters[0]})";
+                if (programm.possibleVariables.Exists(v => v == parameters[0]))
+                {
+                    idName = parameters[0];
+                }
+                else
+                {
+                    error = $"The first parameter is not a number or variable! ({parameters[0]})";
+                }
                 return;
             }
-            if (max <= 0) error = "The distance must be a non-negative and non-zero number!";
-
             if (error != "") return;
         }
 
         public override Command Run(out string error)
         {
+            if (idName != "")
+            {
+                Variable variable = programm.variables.Find(v => v.ID == idName);
+                if (variable is Integer)
+                {
+                    distance = (variable as Integer).value;
+                }
+                idName = "";
+            }
+            if (distance <= 0)
+            {
+                error = "The distance is negative!";
+                return next;
+            }
             gameController.robot.EnterField(gameController.robot);
             gameController.robot.updated = true;
             gameController.robot.animate = true;
@@ -174,7 +263,7 @@ namespace Engine.Programming
 
             error = "";
             counter++;
-            if (counter == max) return next;
+            if (counter == distance) return next;
             return this;
         }
     }

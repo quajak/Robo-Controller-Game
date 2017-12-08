@@ -16,6 +16,9 @@ namespace Engine
         private Command activeCommand;
         public bool Finished = true;
 
+        internal List<Variable> variables = new List<Variable>();
+        internal List<string> possibleVariables = new List<string>();
+
         internal List<Label> labels = new List<Label>();
 
         public Programm(GameController GameControl)
