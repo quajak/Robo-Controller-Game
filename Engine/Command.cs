@@ -8,6 +8,7 @@ namespace Engine.Programming
 {
     internal abstract class Command
     {
+        public bool setNext = true;
         public int CPUTimeMult = 1;
         public Command next;
         protected readonly GameController gameController;
@@ -35,6 +36,13 @@ namespace Engine.Programming
                 case "rot":
                     return new Rotate(parameters, _gameController, _programm, out error);
 
+                case "lbl":
+                    return new Label(parameters, _gameController, _programm, out error);
+
+                case "gt":
+                case "goto":
+                    return new GOTO(parameters, _gameController, _programm, out error);
+
                 default:
                     throw new NotImplementedException();
             }
@@ -42,6 +50,68 @@ namespace Engine.Programming
         }
 
         public abstract Command Run(out string error);
+    }
+
+    internal class Label : Command
+    {
+        public string ID;
+
+        public Label(List<string> parameters, GameController _gameController, Programm _programm, out string error) : base(_gameController, _programm)
+        {
+            error = "";
+            if (parameters.Count != 1)
+            {
+                error = "Syntax Error: Need 1 Parameter!";
+                return;
+            }
+
+            if (programm.labels.Exists(l => l.ID == parameters[0]))
+            {
+                error = $"This label already existst!{parameters[0]}";
+                return;
+            }
+
+            ID = parameters[0];
+            programm.labels.Add(this);
+
+            CPUTimeMult = 0;
+        }
+
+        public override Command Run(out string error)
+        {
+            error = "";
+            return next;
+        }
+    }
+
+    internal class GOTO : Command
+    {
+        public GOTO(List<string> parameters, GameController _gameController, Programm _programm, out string error)
+            : base(_gameController, _programm)
+        {
+            error = "";
+            if (parameters.Count != 1)
+            {
+                error = "Syntax Error: Need 1 paramter!";
+                return;
+            }
+
+            if (!programm.labels.Exists(l => l.ID == parameters[0]))
+            {
+                error = $"No label with the name {parameters[0]} exists!";
+                return;
+            }
+
+            setNext = false;
+            CPUTimeMult = 0;
+            next = programm.labels.First(l => l.ID == parameters[0]);
+        }
+
+        public override Command Run(out string error)
+        {
+            error = "";
+            return next;
+        }
     }
 
     internal class Rotate : Command

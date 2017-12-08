@@ -16,6 +16,8 @@ namespace Engine
         private Command activeCommand;
         public bool Finished = true;
 
+        internal List<Label> labels = new List<Label>();
+
         public Programm(GameController GameControl)
         {
             gameController = GameControl;
@@ -27,6 +29,7 @@ namespace Engine
 
             //Reset
             code = new List<Command>();
+            labels.Clear();
             //Split code
             List<List<string>> rawCode = new List<List<string>>();
             try
@@ -49,10 +52,10 @@ namespace Engine
             {
                 Command newCommand = Command.NewCommand(line, gameController, this, out error);
                 if (error != "") return false;
-                if (code.Count != 0) code.Last().next = newCommand;
+                if (code.Count != 0 && code.Last().setNext) code.Last().next = newCommand;
                 code.Add(newCommand);
             }
-            code.Last().next = new EndExecution(this);
+            if (code.Last().setNext) code.Last().next = new EndExecution(this);
 
             //Get ready for execution
             activeCommand = code.First();
@@ -75,6 +78,7 @@ namespace Engine
         public void Clear()
         {
             code = new List<Command>();
+            labels = new List<Label>();
             Finished = true;
         }
 

@@ -49,7 +49,7 @@
     <Compile Include="GameController.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="GameWorld.cs" />
-    <Compile Include="LanguageParser.cs" />
+    <Compile Include="Programm.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
